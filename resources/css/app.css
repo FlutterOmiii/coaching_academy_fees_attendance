@@ -1,0 +1,560 @@
+/* perfect scrollbar */
+@import 'perfect-scrollbar.min.css';
+
+/* animate.css */
+@import 'animate.css';
+
+/* sweetalert */
+@import 'sweetalert.css';
+
+/* tippy */
+@import 'tippy.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    html {
+        @apply scroll-smooth;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+
+    body {
+        @apply bg-[#fafafa] font-nunito;
+    }
+
+    body.dark {
+        @apply bg-[#060818];
+    }
+
+    /* Panel */
+    .panel {
+        @apply relative rounded-md bg-white p-5 shadow dark:bg-[#0e1726];
+    }
+
+    /* Navbar */
+    .navbar-sticky header,
+    .navbar-floating header {
+        @apply sticky top-0 z-20;
+    }
+    .navbar-floating header {
+        @apply bg-[#fafafa]/90 px-6 pt-4 dark:bg-[#060818]/90;
+    }
+    .navbar-floating header > div > div:first-child {
+        @apply rounded-md;
+    }
+    .horizontal .navbar-floating header > div > div:first-child {
+        @apply rounded-b-none;
+    }
+    .horizontal .navbar-floating header .horizontal-menu {
+        @apply rounded-b-md;
+    }
+
+    /* Sidebar */
+    .sidebar:hover .nav-item > a {
+        @apply w-auto;
+    }
+
+    .sidebar .nav-item > button,
+    .sidebar .nav-item > a {
+        @apply mb-1 flex w-full items-center justify-between overflow-hidden whitespace-nowrap rounded-md p-2.5 text-[#506690] hover:bg-[#000]/[0.08] hover:text-black dark:hover:bg-[#181f32] dark:hover:text-white-dark;
+    }
+    .sidebar .nav-item > button.active,
+    .sidebar .nav-item > a.active {
+        @apply bg-[#000]/[0.08] text-black dark:bg-[#181f32] dark:text-white-dark;
+    }
+
+    .sidebar .nav-item > button.active > div > span,
+    .sidebar .nav-item > a.active > div > span {
+        @apply dark:!text-white-dark;
+    }
+
+    .sidebar ul.sub-menu li button,
+    .sidebar ul.sub-menu li a {
+        @apply flex w-full items-center px-9 py-2.5 before:h-0.5 before:w-2 before:rounded before:bg-gray-300 hover:bg-gray-100
+hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark:before:bg-gray-500 dark:hover:bg-gray-900 dark:hover:text-primary;
+    }
+    .sidebar ul.sub-menu li button.active,
+    .sidebar ul.sub-menu li a.active {
+        @apply text-primary before:bg-primary;
+    }
+
+    .sidebar .nav-item a div:first-child svg,
+    .sidebar .nav-item button div:first-child svg {
+        @apply h-5 w-5 text-black/50 dark:text-white/50;
+    }
+
+    .main-container .main-content {
+        @apply transition-all duration-300 lg:ltr:ml-[260px] lg:rtl:mr-[260px];
+    }
+
+    /* Horizontal layouts */
+    .horizontal .horizontal-menu {
+        @apply hidden shadow-md lg:flex;
+    }
+    .horizontal .horizontal-logo {
+        @apply flex;
+    }
+    .horizontal .main-container .main-content {
+        @apply ltr:ml-0 rtl:mr-0;
+    }
+    .horizontal .sidebar {
+        @apply ltr:-left-[260px] rtl:-right-[260px];
+    }
+    .horizontal.toggle-sidebar .sidebar {
+        @apply ltr:left-0 rtl:right-0 lg:ltr:-left-[260px] lg:rtl:-right-[260px];
+    }
+
+    /* Vertical layouts */
+    .vertical.toggle-sidebar .horizontal-logo,
+    .vertical.toggle-sidebar .collapse-icon {
+        @apply flex;
+    }
+    .vertical.toggle-sidebar .main-container .main-content {
+        @apply ltr:ml-0 rtl:mr-0;
+    }
+    .vertical .sidebar {
+        @apply ltr:-left-[260px] rtl:-right-[260px] lg:ltr:left-0 lg:rtl:right-0;
+    }
+    .vertical.toggle-sidebar .sidebar {
+        @apply ltr:left-0 rtl:right-0 lg:ltr:-left-[260px] lg:rtl:-right-[260px];
+    }
+
+    /* Collapsible vertical layouts */
+    .collapsible-vertical .sidebar {
+        @apply hover:w-[260px] ltr:-left-[260px] rtl:-right-[260px] lg:w-[70px] lg:ltr:left-0 lg:rtl:right-0;
+    }
+    .collapsible-vertical.toggle-sidebar .sidebar {
+        @apply ltr:left-0 rtl:right-0;
+    }
+    .collapsible-vertical.toggle-sidebar .sidebar {
+        @apply lg:w-[260px];
+    }
+    .collapsible-vertical.toggle-sidebar .sidebar .nav-item > a {
+        @apply w-auto;
+    }
+    .collapsible-vertical.toggle-sidebar .main-content {
+        @apply lg:w-[calc(100%-260px)] lg:ltr:ml-[260px] lg:rtl:mr-[260px];
+    }
+
+    .collapsible-vertical .sidebar .sub-menu {
+        @apply lg:hidden;
+    }
+    .collapsible-vertical .sidebar:hover .sub-menu,
+    .collapsible-vertical .sidebar:hover .sub-menu.recent-submenu,
+    .collapsible-vertical.toggle-sidebar .sidebar .sub-menu {
+        @apply block;
+    }
+    .collapsible-vertical .main-content {
+        @apply lg:w-[calc(100%-70px)] lg:ltr:ml-[70px] lg:rtl:mr-[70px];
+    }
+    .collapsible-vertical .sidebar .collapse-icon,
+    .collapsible-vertical .main-logo > span {
+        @apply transition-opacity duration-300 lg:opacity-0;
+    }
+    .collapsible-vertical .sidebar:hover .collapse-icon,
+    .collapsible-vertical.toggle-sidebar .collapse-icon,
+    .collapsible-vertical .sidebar:hover .main-logo > span,
+    .collapsible-vertical.toggle-sidebar .main-logo > span {
+        @apply duration-500 lg:opacity-100;
+    }
+    .collapsible-vertical.toggle-sidebar .sidebar .collapse-icon {
+        @apply flex rotate-0;
+    }
+    .collapsible-vertical .sidebar:hover .collapse-icon {
+        @apply flex rotate-180;
+    }
+    .collapsible-vertical .sidebar ul > h2 span {
+        @apply hidden whitespace-nowrap;
+    }
+    .collapsible-vertical .sidebar ul > h2 svg {
+        @apply block;
+    }
+    .collapsible-vertical .sidebar:hover ul > h2 span,
+    .collapsible-vertical.toggle-sidebar .sidebar ul > h2 span {
+        @apply inline;
+    }
+    .collapsible-vertical .sidebar:hover ul > h2 svg,
+    .collapsible-vertical.toggle-sidebar .sidebar ul > h2 svg {
+        @apply hidden;
+    }
+
+    /* boxed-layout */
+    .boxed-layout {
+        @apply mx-auto max-w-[1400px];
+    }
+
+    .boxed-layout.vertical .sidebar,
+    .boxed-layout.collapsible-vertical .sidebar {
+        @apply overflow-hidden lg:ltr:left-auto lg:rtl:right-auto;
+    }
+
+    .boxed-layout.vertical.toggle-sidebar .sidebar {
+        @apply lg:w-0;
+    }
+
+    /* Buttons */
+    .btn {
+        @apply relative flex items-center justify-center rounded-md border px-5 py-2 text-sm font-semibold shadow-[0_10px_20px_-10px] outline-none transition duration-300 hover:shadow-none;
+    }
+    .btn-lg {
+        @apply px-7 py-2.5 text-base;
+    }
+    .btn-sm {
+        @apply px-2.5 py-1.5 text-xs;
+    }
+    .btn[disabled] {
+        @apply cursor-not-allowed opacity-60;
+    }
+
+    .btn-primary {
+        @apply border-primary bg-primary text-white shadow-primary/60;
+    }
+    .btn-outline-primary {
+        @apply border-primary text-primary shadow-none hover:bg-primary hover:text-white;
+    }
+
+    .btn-secondary {
+        @apply border-secondary bg-secondary text-white shadow-secondary/60;
+    }
+    .btn-outline-secondary {
+        @apply border-secondary text-secondary shadow-none hover:bg-secondary hover:text-white;
+    }
+
+    .btn-success {
+        @apply border-success bg-success text-white shadow-success/60;
+    }
+    .btn-outline-success {
+        @apply border-success text-success shadow-none hover:bg-success hover:text-white;
+    }
+
+    .btn-danger {
+        @apply border-danger bg-danger text-white shadow-danger/60;
+    }
+    .btn-outline-danger {
+        @apply border-danger text-danger shadow-none hover:bg-danger hover:text-white;
+    }
+
+    .btn-warning {
+        @apply border-warning bg-warning text-white shadow-warning/60;
+    }
+    .btn-outline-warning {
+        @apply border-warning text-warning shadow-none hover:bg-warning hover:text-white;
+    }
+
+    .btn-info {
+        @apply border-info bg-info text-white shadow-info/60;
+    }
+    .btn-outline-info {
+        @apply border-info text-info shadow-none hover:bg-info hover:text-white;
+    }
+
+    .btn-dark {
+        @apply border-dark bg-dark text-white shadow-dark/60;
+    }
+
+    .btn-outline-dark {
+        @apply border-dark text-dark shadow-none hover:bg-dark hover:text-white;
+    }
+
+    /* Badge */
+    .badge {
+        @apply relative my-1 rounded border border-transparent px-2 py-0.5 text-xs font-semibold text-white;
+    }
+    .badge-outline-primary {
+        @apply border-primary text-primary hover:bg-primary-light dark:hover:bg-primary dark:hover:text-white-light;
+    }
+    .badge-outline-secondary {
+        @apply border-secondary text-secondary hover:bg-secondary-light dark:hover:bg-secondary dark:hover:text-white-light;
+    }
+    .badge-outline-success {
+        @apply border-success text-success hover:bg-success-light dark:hover:bg-success dark:hover:text-white-light;
+    }
+    .badge-outline-danger {
+        @apply border-danger text-danger hover:bg-danger-light dark:hover:bg-danger dark:hover:text-white-light;
+    }
+    .badge-outline-warning {
+        @apply border-warning text-warning hover:bg-warning-light dark:hover:bg-warning dark:hover:text-white-light;
+    }
+    .badge-outline-info {
+        @apply border-info text-info hover:bg-info-light dark:hover:bg-info dark:hover:text-white-light;
+    }
+    .badge-outline-dark {
+        @apply border-dark text-dark hover:bg-dark-light dark:hover:bg-dark dark:hover:text-white-light;
+    }
+
+    /* Form */
+    .form-input,
+    .form-textarea,
+    .form-select,
+    .form-multiselect {
+        @apply w-full rounded-md border border-[#e0e6ed] bg-white px-4 py-2 text-sm font-semibold text-black !outline-none focus:border-primary focus:ring-transparent dark:border-[#17263c] dark:bg-[#121e32] dark:text-white-dark dark:focus:border-primary;
+    }
+
+    .form-input-lg,
+    .form-textarea-lg,
+    .form-select-lg,
+    .form-multiselect-lg {
+        @apply py-2.5 text-base;
+    }
+    .form-input-sm,
+    .form-textarea-sm,
+    .form-select-sm,
+    .form-multiselect-sm {
+        @apply py-1.5 text-xs;
+    }
+    label {
+        @apply mb-1.5 block font-semibold;
+    }
+    [dir='rtl'] select {
+        background-position: left 0.5rem center;
+    }
+
+    .has-error .form-input,
+    .has-error .form-textarea,
+    .has-error .form-select,
+    .has-error .form-multiselect {
+        @apply border-danger bg-danger/[0.08] text-danger placeholder-danger/70 focus:border-danger;
+    }
+    .has-error .form-label,
+    .has-error .form-help,
+    .has-error .form-icon {
+        @apply text-danger;
+    }
+
+    .has-success .form-input,
+    .has-success .form-textarea,
+    .has-success .form-select,
+    .has-success .form-multiselect {
+        @apply border-success bg-success/[0.08] text-success placeholder-success/70 focus:border-success;
+    }
+    .has-success .form-label,
+    .has-success .form-help,
+    .has-success .form-icon {
+        @apply text-success;
+    }
+
+    /* checkbox & radio */
+    .form-radio,
+    .form-checkbox {
+        @apply h-5 w-5 cursor-pointer rounded border-2 border-[#e0e6ed] bg-transparent text-primary !shadow-none !outline-none !ring-0 !ring-offset-0 checked:bg-[length:90%_90%] disabled:cursor-not-allowed disabled:bg-[#eee] ltr:mr-1.5 rtl:ml-1.5
+      dark:border-[#253b5c] dark:checked:border-transparent dark:disabled:bg-[#1b2e4b];
+    }
+
+    .form-radio {
+        @apply rounded-full;
+    }
+
+    /* dropdown */
+    .dropdown {
+        @apply relative;
+    }
+    .dropdown > button {
+        @apply flex;
+    }
+    .dropdown ul {
+        @apply absolute z-10 mt-1 min-w-[120px] rounded bg-white p-0 py-2 text-black shadow dark:bg-[#1b2e4b] dark:text-white-dark;
+    }
+    .dropdown ul li > a,
+    .dropdown ul li > button {
+        @apply flex items-center px-4 py-2 hover:bg-primary/10 hover:text-primary;
+    }
+
+    .dropdown ul li > button {
+        @apply w-full;
+    }
+
+    /* tables */
+    .table-responsive {
+        @apply overflow-auto;
+    }
+    table {
+        @apply w-full !border-collapse;
+    }
+    table thead tr,
+    table tfoot tr {
+        @apply border-b-0 !bg-[#f6f8fa]  dark:!bg-[#1a2941];
+    }
+    table thead tr th,
+    table tfoot tr th,
+    table tbody tr td {
+        @apply py-3 px-4 ltr:text-left rtl:text-right;
+    }
+    table thead tr th,
+    table tfoot tr th {
+        @apply font-semibold;
+    }
+    table tbody tr {
+        @apply border-b !border-white-light/40 dark:!border-[#191e3a];
+    }
+    table.table-hover tbody tr {
+        @apply hover:!bg-white-light/20 dark:hover:!bg-[#1a2941]/40;
+    }
+    table.table-striped tbody tr:nth-child(odd) {
+        @apply !bg-white-light/20 dark:!bg-[#1a2941]/40;
+    }
+
+    /* code hightlight */
+    pre {
+        direction: ltr;
+    }
+
+    /* ------------------------------------------------------------------
+       Mobile
+       Coaches run this from a phone on the ground, so touch comes first.
+       ------------------------------------------------------------------ */
+
+    /* iOS zooms the page when a focused input is under 16px. */
+    @media (max-width: 767px) {
+        .form-input,
+        .form-textarea,
+        .form-select,
+        .form-multiselect {
+            @apply text-base;
+            font-size: 16px;
+        }
+
+        /* Comfortable thumb targets. */
+        .btn {
+            @apply min-h-[44px] px-4;
+        }
+        .btn-sm {
+            @apply min-h-[38px];
+        }
+        .form-radio,
+        .form-checkbox {
+            @apply h-6 w-6;
+        }
+
+        /* Panels use the full width on small screens. */
+        .panel {
+            @apply p-4;
+        }
+    }
+
+    /*
+       Stacking table: on phones each row becomes a card and every cell is
+       labelled from its data-label. Add .table-stack to the <table>.
+    */
+    @media (max-width: 767px) {
+        table.table-stack thead {
+            @apply hidden;
+        }
+        table.table-stack tbody tr {
+            @apply block mb-3 rounded-lg border border-white-light bg-white p-3 shadow-sm dark:border-[#1b2e4b] dark:bg-[#0e1726];
+        }
+        /* Default: stack as a plain readable block. */
+        table.table-stack tbody tr td {
+            @apply block border-0 px-0 py-1.5 ltr:text-left rtl:text-right;
+        }
+        /*
+           Cells that declare a non-empty data-label render as a label/value
+           row. data-label="" opts a cell back into the plain block above.
+        */
+        table.table-stack tbody tr td[data-label]:not([data-label='']) {
+            @apply flex items-center justify-between gap-3 ltr:text-right rtl:text-left;
+        }
+        table.table-stack tbody tr td[data-label]:not([data-label=''])::before {
+            content: attr(data-label);
+            @apply shrink-0 text-xs font-bold uppercase text-white-dark ltr:text-left rtl:text-right;
+        }
+        table.table-stack tbody tr td.cell-actions {
+            @apply mt-2 justify-start border-t border-white-light pt-3 dark:border-[#1b2e4b];
+        }
+        table.table-stack tbody tr td.cell-empty {
+            @apply block text-center;
+        }
+        table.table-stack tbody tr td.cell-empty::before {
+            @apply hidden;
+        }
+    }
+
+    /* Segmented attendance control — big tap targets, colour-coded. */
+    .seg-option {
+        @apply flex cursor-pointer select-none items-center justify-center rounded-md border border-white-light py-2.5 text-xs font-bold uppercase transition dark:border-[#1b2e4b];
+    }
+    .seg-input:checked + .seg-option {
+        @apply text-white;
+    }
+    .seg-input:checked + .seg-present {
+        @apply border-success bg-success;
+    }
+    .seg-input:checked + .seg-late {
+        @apply border-warning bg-warning;
+    }
+    .seg-input:checked + .seg-absent {
+        @apply border-danger bg-danger;
+    }
+    .seg-input:checked + .seg-excused {
+        @apply border-info bg-info;
+    }
+
+    /* Bottom quick-nav, phones only. */
+    .bottom-nav {
+        @apply fixed inset-x-0 bottom-0 z-40 flex border-t border-white-light bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_10px_rgba(0,0,0,0.06)] dark:border-[#1b2e4b] dark:bg-[#0e1726] lg:hidden;
+    }
+    .bottom-nav a {
+        @apply flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-semibold text-white-dark transition;
+    }
+    .bottom-nav a.active {
+        @apply text-primary;
+    }
+}
+
+/* perfect scrollbar */
+.ps__rail-y > .ps__thumb-y,
+.ps__rail-y > .ps__thumb-y {
+    @apply !w-1.5 !bg-[#DDDDDD] dark:!bg-[#2d334c];
+}
+.ps .ps__rail-x:hover,
+.ps .ps__rail-y:hover,
+.ps .ps__rail-x:focus,
+.ps .ps__rail-y:focus,
+.ps .ps__rail-x.ps--clicking,
+.ps .ps__rail-y.ps--clicking {
+    @apply !opacity-60;
+}
+.ps .ps__rail-x:hover,
+.ps .ps__rail-y:hover,
+.ps .ps__rail-x:focus,
+.ps .ps__rail-y:focus,
+.ps .ps__rail-x.ps--clicking,
+.ps .ps__rail-y.ps--clicking {
+    @apply !bg-transparent;
+}
+
+/* swal2 */
+.swal2-container .swal2-close {
+    @apply text-white hover:text-dark-light focus:shadow-none;
+}
+
+.swal2-container .swal2-popup.swal2-toast {
+    @apply bg-dark py-2.5 px-5;
+}
+
+.swal2-popup.swal2-toast .swal2-title,
+.swal2-container .swal2-popup.swal2-toast .swal2-html-container {
+    @apply text-white;
+}
+.swal2-container .swal2-popup.swal2-toast.color-primary {
+    @apply bg-primary;
+}
+.swal2-container .swal2-popup.swal2-toast.color-secondary {
+    @apply bg-secondary;
+}
+.swal2-container .swal2-popup.swal2-toast.color-warning {
+    @apply bg-warning;
+}
+.swal2-container .swal2-popup.swal2-toast.color-info {
+    @apply bg-info;
+}
+.swal2-container .swal2-popup.swal2-toast.color-danger {
+    @apply bg-danger;
+}
+.swal2-container .swal2-popup.swal2-toast.color-success {
+    @apply bg-success;
+}
