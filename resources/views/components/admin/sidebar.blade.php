@@ -20,10 +20,16 @@
             ['Fee Collection', 'fees', 'admin.fees.index', 'fees.view'],
             ['Invoices', 'invoice', 'admin.fees.invoices', 'fees.view'],
             ['Pending Fees', 'pending', 'admin.fees.pending', 'fees.view'],
+            ['Expenses', 'expense', 'admin.expenses.index', 'expenses.view'],
         ],
         'Insights' => [
             ['Reports', 'report', 'admin.reports.index', 'reports.view'],
             ['Events Calendar', 'calendar', 'admin.calendar.index', 'calendar.view'],
+        ],
+        // Owner-only: personal.manage is held by no other role, so the whole
+        // group disappears for everyone else (empty groups are dropped below).
+        'Personal' => [
+            ['My Expenses', 'wallet', 'admin.personal.index', 'personal.manage'],
         ],
     ];
 
@@ -48,6 +54,8 @@
         'fees' => '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" opacity="0.5"/><path d="M12 7V17M14.5 9.5C14.5 8.67157 13.3807 8 12 8C10.6193 8 9.5 8.67157 9.5 9.5C9.5 10.3284 10.6193 11 12 11C13.3807 11 14.5 11.6716 14.5 12.5C14.5 13.3284 13.3807 14 12 14C10.6193 14 9.5 13.3284 9.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
         'invoice' => '<path opacity="0.5" d="M5 3H19V21L16 19L13 21L10 19L7 21L5 19V3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 8H15M9 12H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
         'pending' => '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" opacity="0.5"/><path d="M12 7V12L15 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
+        'expense' => '<path opacity="0.5" d="M3 7C3 5.9 3.9 5 5 5H19C20.1 5 21 5.9 21 7V17C21 18.1 20.1 19 19 19H5C3.9 19 3 18.1 3 17V7Z" stroke="currentColor" stroke-width="1.5"/><path d="M3 10H21M7 15H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+        'wallet' => '<path opacity="0.5" d="M3 8C3 6.34 4.34 5 6 5H16C17.66 5 19 6.34 19 8V9H21V17C21 18.66 19.66 20 18 20H6C4.34 20 3 18.66 3 17V8Z" stroke="currentColor" stroke-width="1.5"/><path d="M16 12.5C16 11.67 16.67 11 17.5 11H21V14H17.5C16.67 14 16 13.33 16 12.5Z" stroke="currentColor" stroke-width="1.5"/>',
         'match' => '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" opacity="0.5"/><path d="M12 3C12 3 9 7 9 12C9 17 12 21 12 21M12 3C12 3 15 7 15 12C15 17 12 21 12 21" stroke="currentColor" stroke-width="1.5"/>',
         'trophy' => '<path d="M8 4H16V10C16 12.2091 14.2091 14 12 14C9.79086 14 8 12.2091 8 10V4Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path opacity="0.5" d="M8 6H5V7C5 8.65685 6.34315 10 8 10M16 6H19V7C19 8.65685 17.6569 10 16 10M12 14V18M9 21H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
         'team' => '<circle cx="9" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="17" cy="9" r="2" stroke="currentColor" stroke-width="1.5" opacity="0.5"/><path opacity="0.5" d="M3 20C3 16.6863 5.68629 14 9 14C12.3137 14 15 16.6863 15 20M17 14C19.2091 14 21 15.7909 21 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',

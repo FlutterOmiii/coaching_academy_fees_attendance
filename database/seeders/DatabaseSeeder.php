@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             TournamentSeeder::class,
             AssessmentSeeder::class,
             EventSeeder::class,
+            ExpenseSeeder::class,
         ]);
     }
 }

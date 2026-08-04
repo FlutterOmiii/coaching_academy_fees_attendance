@@ -46,6 +46,7 @@ class Admin extends Authenticatable
             'leaves.view', 'leaves.manage', 'leaves.delete',
             'training.view', 'training.manage', 'training.delete',
             'fees.view', 'fees.manage', 'fees.delete',
+            'expenses.view', 'expenses.manage', 'expenses.delete',
             'matches.view', 'matches.manage', 'matches.delete',
             'tournaments.view', 'tournaments.manage', 'tournaments.delete',
             'teams.view', 'teams.manage', 'teams.delete',
@@ -72,11 +73,13 @@ class Admin extends Authenticatable
         ],
 
         // Money only: the ledger, the students it belongs to, and reports.
+        // Manages expenses but, like fees, cannot delete them (owner/admin only).
         self::ROLE_ACCOUNTANT => [
             'dashboard.view', 'finance.view',
             'students.view',
             'batches.view',
             'fees.view', 'fees.manage',
+            'expenses.view', 'expenses.manage',
             'reports.view',
         ],
     ];

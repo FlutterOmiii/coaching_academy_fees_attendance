@@ -21,6 +21,17 @@
             @method('PUT')
         @endif
 
+        {{-- Digital Admission Form — capture or upload the student's photo --}}
+        <div class="panel">
+            <div class="flex items-center gap-2 mb-1">
+                <span class="text-lg">📸</span>
+                <h5 class="text-lg font-semibold dark:text-white-light">Digital Admission Form</h5>
+            </div>
+            <p class="mb-5 text-xs text-white-dark">Take the student's photo live with the camera, or upload an existing one.</p>
+            <x-admin.photo-capture name="photo"
+                :current="$student->photo ? \App\Helpers\StorageHelper::url($student->photo) : null" />
+        </div>
+
         {{-- Personal --}}
         <div class="panel">
             <h5 class="mb-5 text-lg font-semibold dark:text-white-light">Personal Details</h5>
@@ -55,10 +66,6 @@
                             <option value="{{ $bg }}" @selected(old('blood_group', $student->blood_group) === $bg)>{{ $bg }}</option>
                         @endforeach
                     </select>
-                </x-admin.field>
-
-                <x-admin.field label="Photo" name="photo" hint="JPG or PNG, max 2 MB">
-                    <input type="file" name="photo" id="photo" class="form-input" accept="image/*" />
                 </x-admin.field>
             </div>
         </div>

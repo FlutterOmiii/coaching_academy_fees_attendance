@@ -6,7 +6,9 @@ use App\Http\Controllers\Admin\BatchController;
 use App\Http\Controllers\Admin\CalendarController;
 use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\FeeController;
+use App\Http\Controllers\Admin\PersonalExpenseController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\TrainingSessionController;
@@ -170,6 +172,50 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 ->name('fees.structures.destroy');
             Route::delete('fees/invoices/{invoice}', [FeeController::class, 'destroyInvoice'])
                 ->name('fees.invoices.destroy');
+        });
+
+        // ---------------------------------------------------------- Expenses
+        // Business-expense tracker. Financial data — coaches hold no abilities.
+        Route::middleware('ability:expenses.view')->group(function () {
+            Route::get('expenses', [ExpenseController::class, 'index'])->name('expenses.index');
+            Route::get('expenses/list', [ExpenseController::class, 'list'])->name('expenses.list');
+            Route::get('expenses/categories', [ExpenseController::class, 'categories'])->name('expenses.categories');
+        });
+
+        Route::middleware('ability:expenses.manage')->group(function () {
+            Route::get('expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
+            Route::post('expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+            Route::get('expenses/{expense}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
+            Route::put('expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
+
+            Route::post('expenses/categories', [ExpenseController::class, 'storeCategory'])
+                ->name('expenses.categories.store');
+            Route::post('expenses/categories/quick', [ExpenseController::class, 'quickCategory'])
+                ->name('expenses.categories.quick');
+            Route::put('expenses/categories/{category}', [ExpenseController::class, 'updateCategory'])
+                ->name('expenses.categories.update');
+        });
+
+        Route::middleware('ability:expenses.delete')->group(function () {
+            Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+            Route::delete('expenses/categories/{category}', [ExpenseController::class, 'destroyCategory'])
+                ->name('expenses.categories.destroy');
+        });
+
+        // ------------------------------------------------------ My Expenses
+        // The owner's private ledger with its own analytics page. personal.manage
+        // is owner-only (no other role holds it) and fully separate from the books.
+        Route::middleware('ability:personal.manage')->group(function () {
+            Route::get('personal-expenses', [PersonalExpenseController::class, 'index'])
+                ->name('personal.index');
+            Route::post('personal-expenses/categories/quick', [PersonalExpenseController::class, 'quickCategory'])
+                ->name('personal.categories.quick');
+            Route::post('personal-expenses', [PersonalExpenseController::class, 'store'])
+                ->name('personal.store');
+            Route::put('personal-expenses/{personalExpense}', [PersonalExpenseController::class, 'update'])
+                ->name('personal.update');
+            Route::delete('personal-expenses/{personalExpense}', [PersonalExpenseController::class, 'destroy'])
+                ->name('personal.destroy');
         });
 
         // Matches, Tournaments, Teams and Performance modules removed from the

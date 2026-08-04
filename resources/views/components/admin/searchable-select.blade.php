@@ -6,6 +6,9 @@
     'required' => false,
     'submitOnChange' => false,   // filter dropdowns: submit the form on pick
     'allowClear' => true,
+    'allowAdd' => false,         // show a "+ Add <typed>" row that creates an option
+    'addUrl' => null,            // endpoint that creates it and returns {id, name} JSON
+    'addLabel' => 'Add',         // verb shown in the add row, e.g. "Add category"
 ])
 
 @php
@@ -48,6 +51,9 @@
         selectedId: @js($current),
         selectedLabel: @js($currentLabel),
         items: @js($items),
+        allowAdd: {{ $allowAdd ? 'true' : 'false' }},
+        addUrl: @js($addUrl),
+        adding: false,
 
         get filtered() {
             const q = this.search.trim().toLowerCase();
@@ -101,7 +107,47 @@
 
         pickHighlighted() {
             const opt = this.filtered[this.highlight];
-            if (opt) this.choose(opt);
+            if (opt) {
+                this.choose(opt);
+            } else if (this.canAdd) {
+                this.addNew();
+            }
+        },
+
+        /* Whether the typed text can be added as a brand-new option. */
+        get canAdd() {
+            const q = this.search.trim();
+            if (!this.allowAdd || !this.addUrl || !q) return false;
+            // Nothing to add if it already exists (case-insensitive).
+            return !this.items.some(o => o.name.toLowerCase() === q.toLowerCase());
+        },
+
+        /* Create the typed option server-side, then select it. */
+        async addNew() {
+            const name = this.search.trim();
+            if (!this.canAdd || this.adding) return;
+            this.adding = true;
+            try {
+                const token = document.querySelector('meta[name=\'csrf-token\']')?.content;
+                const res = await fetch(this.addUrl, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json',
+                    },
+                    body: 'name=' + encodeURIComponent(name),
+                });
+                if (!res.ok) throw new Error('add failed');
+                const data = await res.json();
+                const opt = { id: String(data.id), name: data.name, hint: data.hint || '' };
+                if (!this.items.some(o => o.id === opt.id)) this.items.push(opt);
+                this.choose(opt);
+            } catch (e) {
+                alert('Could not add “' + name + '”. It may already exist, or you may not have permission.');
+            } finally {
+                this.adding = false;
+            }
         },
     }"
     @keydown.escape.stop="open = false"
@@ -161,10 +207,24 @@
                 </li>
             </template>
 
-            <li x-show="filtered.length === 0" class="px-3 py-4 text-sm text-center text-white-dark">
+            <li x-show="filtered.length === 0 && !canAdd" class="px-3 py-4 text-sm text-center text-white-dark">
                 No matches for “<span x-text="search"></span>”
             </li>
         </ul>
+
+        @if ($allowAdd)
+            {{-- Inline create: turns the typed text into a new option. --}}
+            <div x-show="canAdd" class="border-t border-[#e0e6ed] dark:border-[#253b5e]">
+                <button type="button" @click="addNew()" :disabled="adding"
+                    class="flex items-center w-full gap-2 px-3 py-2.5 text-sm font-semibold text-left text-primary hover:bg-primary/10">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+                    </svg>
+                    <span x-show="!adding">{{ $addLabel }} “<span x-text="search.trim()"></span>”</span>
+                    <span x-show="adding" x-cloak>Adding…</span>
+                </button>
+            </div>
+        @endif
 
         <div x-show="items.length > 8" class="px-3 py-1.5 text-[10px] border-t text-white-dark border-[#e0e6ed] dark:border-[#253b5e]">
             <span x-text="filtered.length"></span> of <span x-text="items.length"></span> options
