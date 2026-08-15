@@ -26,7 +26,7 @@
             </select>
             <div class="flex gap-2">
                 <button class="btn btn-primary flex-1">Filter</button>
-                <a href="{{ route('admin.coaches.index') }}" class="btn btn-outline-danger">Reset</a>
+                <a href="{{ route('admin.coaches.index') }}" class="btn btn-ghost">Reset</a>
             </div>
         </form>
     </div>

@@ -25,7 +25,7 @@
             <input type="month" name="month" value="{{ request('month') }}" class="form-input" />
             <div class="flex gap-2">
                 <button class="btn btn-primary flex-1">Filter</button>
-                <a href="{{ route('admin.expenses.list') }}" class="btn btn-outline-danger">Reset</a>
+                <a href="{{ route('admin.expenses.list') }}" class="btn btn-ghost">Reset</a>
             </div>
         </form>
     </div>

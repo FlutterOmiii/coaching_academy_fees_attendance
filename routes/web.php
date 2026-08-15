@@ -107,6 +107,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // -------------------------------------------------------- Attendance
         Route::middleware('ability:attendance.view')->group(function () {
             Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+            Route::get('attendance/daily', [AttendanceController::class, 'daily'])->name('attendance.daily');
             Route::get('attendance/report', [AttendanceController::class, 'report'])->name('attendance.report');
             Route::get('attendance/coaches', [AttendanceController::class, 'coaches'])->name('attendance.coaches');
         });

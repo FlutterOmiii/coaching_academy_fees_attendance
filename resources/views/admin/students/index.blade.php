@@ -50,8 +50,8 @@
             </select>
 
             <div class="flex gap-2">
-                <button type="submit" class="btn btn-primary flex-1">Filter</button>
-                <a href="{{ route('admin.students.index') }}" class="btn btn-outline-danger">Reset</a>
+                <button type="submit" class="flex-1 btn btn-primary">Filter</button>
+                <a href="{{ route('admin.students.index') }}" class="btn btn-ghost">Reset</a>
             </div>
         </form>
     </div>
@@ -111,21 +111,14 @@
                             </td>
                             <td data-label="Status"><x-admin.status-badge :status="$student->status" /></td>
                             <td class="cell-actions" data-label="">
-                                <div class="flex items-center gap-1 md:justify-center">
-                                    <a href="{{ route('admin.students.show', $student) }}"
-                                        class="btn btn-sm btn-outline-info">View</a>
-@ability('students.edit')
-                                    <a href="{{ route('admin.students.edit', $student) }}"
-                                        class="btn btn-sm btn-outline-primary">Edit</a>
-@endability
-@ability('students.delete')
-                                    <form method="POST" action="{{ route('admin.students.destroy', $student) }}"
-                                        onsubmit="return confirm('Remove {{ $student->full_name }}?')">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                    </form>
-@endability
-                                </div>
+                                <x-admin.row-actions
+                                    :view="route('admin.students.show', $student)"
+                                    :edit="route('admin.students.edit', $student)"
+                                    :delete="route('admin.students.destroy', $student)"
+                                    edit-ability="students.edit"
+                                    delete-ability="students.delete"
+                                    view-label="View profile"
+                                    :confirm="'Remove ' . $student->full_name . '?'" />
                             </td>
                         </tr>
                     @empty

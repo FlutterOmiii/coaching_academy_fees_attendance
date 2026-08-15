@@ -31,9 +31,17 @@
         @apply bg-[#060818];
     }
 
+    ::selection {
+        @apply bg-primary/20 text-black dark:text-white;
+    }
+
     /* Panel */
     .panel {
-        @apply relative rounded-md bg-white p-5 shadow dark:bg-[#0e1726];
+        @apply relative rounded-xl border border-black/[0.04] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_2px_8px_rgba(16,24,40,0.04)] transition-shadow duration-200 dark:border-white/[0.05] dark:bg-[#0e1726] dark:shadow-none;
+    }
+    /* Interactive cards get a gentle lift on hover. */
+    .panel-hover {
+        @apply hover:shadow-[0_2px_4px_rgba(16,24,40,0.05),0_8px_24px_rgba(16,24,40,0.08)] hover:-translate-y-0.5;
     }
 
     /* Navbar */
@@ -61,16 +69,23 @@
 
     .sidebar .nav-item > button,
     .sidebar .nav-item > a {
-        @apply mb-1 flex w-full items-center justify-between overflow-hidden whitespace-nowrap rounded-md p-2.5 text-[#506690] hover:bg-[#000]/[0.08] hover:text-black dark:hover:bg-[#181f32] dark:hover:text-white-dark;
+        @apply mb-0.5 flex w-full items-center justify-between overflow-hidden whitespace-nowrap rounded-lg p-2.5 font-medium text-[#506690] transition-colors duration-200 hover:bg-primary/[0.07] hover:text-primary dark:hover:bg-primary/10 dark:hover:text-primary;
     }
     .sidebar .nav-item > button.active,
     .sidebar .nav-item > a.active {
-        @apply bg-[#000]/[0.08] text-black dark:bg-[#181f32] dark:text-white-dark;
+        @apply bg-primary/10 font-semibold text-primary dark:bg-primary/15 dark:text-primary;
     }
 
     .sidebar .nav-item > button.active > div > span,
     .sidebar .nav-item > a.active > div > span {
-        @apply dark:!text-white-dark;
+        @apply dark:!text-primary;
+    }
+    /* Active/hover items carry the brand colour through to their icon. */
+    .sidebar .nav-item > a.active div:first-child svg,
+    .sidebar .nav-item > button.active div:first-child svg,
+    .sidebar .nav-item > a:hover div:first-child svg,
+    .sidebar .nav-item > button:hover div:first-child svg {
+        @apply !text-primary;
     }
 
     .sidebar ul.sub-menu li button,
@@ -199,71 +214,93 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
 
     /* Buttons */
     .btn {
-        @apply relative flex items-center justify-center rounded-md border px-5 py-2 text-sm font-semibold shadow-[0_10px_20px_-10px] outline-none transition duration-300 hover:shadow-none;
+        @apply relative inline-flex items-center justify-center gap-1.5 rounded-lg border border-transparent px-4 py-2 text-sm font-semibold outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#fafafa] active:translate-y-px dark:focus-visible:ring-offset-[#060818];
     }
     .btn-lg {
-        @apply px-7 py-2.5 text-base;
+        @apply gap-2 px-6 py-2.5 text-base;
     }
     .btn-sm {
-        @apply px-2.5 py-1.5 text-xs;
+        @apply gap-1 px-3 py-1.5 text-xs;
     }
     .btn[disabled] {
-        @apply cursor-not-allowed opacity-60;
+        @apply pointer-events-none cursor-not-allowed opacity-60;
     }
 
+    /* Solid buttons: a soft tinted shadow, and a subtle darken on hover. */
     .btn-primary {
-        @apply border-primary bg-primary text-white shadow-primary/60;
+        @apply border-primary bg-primary text-white shadow-sm shadow-primary/25 hover:shadow-md hover:shadow-primary/30 hover:brightness-[0.96];
     }
     .btn-outline-primary {
-        @apply border-primary text-primary shadow-none hover:bg-primary hover:text-white;
+        @apply border-primary/40 text-primary hover:border-primary hover:bg-primary hover:text-white;
     }
 
     .btn-secondary {
-        @apply border-secondary bg-secondary text-white shadow-secondary/60;
+        @apply border-secondary bg-secondary text-white shadow-sm shadow-secondary/25 hover:shadow-md hover:shadow-secondary/30 hover:brightness-[0.96];
     }
     .btn-outline-secondary {
-        @apply border-secondary text-secondary shadow-none hover:bg-secondary hover:text-white;
+        @apply border-secondary/40 text-secondary hover:border-secondary hover:bg-secondary hover:text-white;
     }
 
     .btn-success {
-        @apply border-success bg-success text-white shadow-success/60;
+        @apply border-success bg-success text-white shadow-sm shadow-success/25 hover:shadow-md hover:shadow-success/30 hover:brightness-[0.96];
     }
     .btn-outline-success {
-        @apply border-success text-success shadow-none hover:bg-success hover:text-white;
+        @apply border-success/40 text-success hover:border-success hover:bg-success hover:text-white;
     }
 
     .btn-danger {
-        @apply border-danger bg-danger text-white shadow-danger/60;
+        @apply border-danger bg-danger text-white shadow-sm shadow-danger/25 hover:shadow-md hover:shadow-danger/30 hover:brightness-[0.96];
     }
     .btn-outline-danger {
-        @apply border-danger text-danger shadow-none hover:bg-danger hover:text-white;
+        @apply border-danger/40 text-danger hover:border-danger hover:bg-danger hover:text-white;
     }
 
     .btn-warning {
-        @apply border-warning bg-warning text-white shadow-warning/60;
+        @apply border-warning bg-warning text-white shadow-sm shadow-warning/25 hover:shadow-md hover:shadow-warning/30 hover:brightness-[0.96];
     }
     .btn-outline-warning {
-        @apply border-warning text-warning shadow-none hover:bg-warning hover:text-white;
+        @apply border-warning/40 text-warning hover:border-warning hover:bg-warning hover:text-white;
     }
 
     .btn-info {
-        @apply border-info bg-info text-white shadow-info/60;
+        @apply border-info bg-info text-white shadow-sm shadow-info/25 hover:shadow-md hover:shadow-info/30 hover:brightness-[0.96];
     }
     .btn-outline-info {
-        @apply border-info text-info shadow-none hover:bg-info hover:text-white;
+        @apply border-info/40 text-info hover:border-info hover:bg-info hover:text-white;
     }
 
     .btn-dark {
-        @apply border-dark bg-dark text-white shadow-dark/60;
+        @apply border-dark bg-dark text-white shadow-sm shadow-dark/25 hover:shadow-md hover:shadow-dark/30 hover:brightness-[0.96];
+    }
+    .btn-outline-dark {
+        @apply border-dark/40 text-dark hover:border-dark hover:bg-dark hover:text-white dark:text-white-dark;
     }
 
-    .btn-outline-dark {
-        @apply border-dark text-dark shadow-none hover:bg-dark hover:text-white;
+    /* Neutral secondary action — reset, cancel, "back". */
+    .btn-ghost {
+        @apply border-transparent bg-black/[0.04] text-[#506690] hover:bg-black/[0.08] dark:bg-white/[0.06] dark:text-white-dark dark:hover:bg-white/[0.1];
+    }
+
+    /* Icon-only actions for dense rows and toolbars. */
+    .btn-icon {
+        @apply inline-grid h-8 w-8 shrink-0 place-content-center rounded-lg border border-transparent text-white-dark outline-none transition-all duration-200 hover:bg-black/[0.05] focus-visible:ring-2 focus-visible:ring-primary/30 dark:hover:bg-white/[0.06];
+    }
+    .btn-icon svg {
+        @apply h-[18px] w-[18px];
+    }
+    .btn-icon-primary {
+        @apply hover:bg-primary/10 hover:text-primary;
+    }
+    .btn-icon-info {
+        @apply hover:bg-info/10 hover:text-info;
+    }
+    .btn-icon-danger {
+        @apply hover:bg-danger/10 hover:text-danger;
     }
 
     /* Badge */
     .badge {
-        @apply relative my-1 rounded border border-transparent px-2 py-0.5 text-xs font-semibold text-white;
+        @apply relative my-0.5 inline-flex items-center rounded-full border border-transparent px-2.5 py-0.5 text-xs font-semibold text-white;
     }
     .badge-outline-primary {
         @apply border-primary text-primary hover:bg-primary-light dark:hover:bg-primary dark:hover:text-white-light;
@@ -292,7 +329,7 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     .form-textarea,
     .form-select,
     .form-multiselect {
-        @apply w-full rounded-md border border-[#e0e6ed] bg-white px-4 py-2 text-sm font-semibold text-black !outline-none focus:border-primary focus:ring-transparent dark:border-[#17263c] dark:bg-[#121e32] dark:text-white-dark dark:focus:border-primary;
+        @apply w-full rounded-lg border border-[#e0e6ed] bg-white px-4 py-2.5 text-sm font-medium text-black !outline-none transition duration-200 placeholder:font-normal placeholder:text-white-dark/70 focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-[#17263c] dark:bg-[#121e32] dark:text-white-dark dark:focus:border-primary dark:focus:ring-primary/15;
     }
 
     .form-input-lg,
@@ -377,22 +414,22 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     }
     table thead tr,
     table tfoot tr {
-        @apply border-b-0 !bg-[#f6f8fa]  dark:!bg-[#1a2941];
+        @apply border-b border-[#e6e9ef] dark:border-[#1b2e4b];
     }
     table thead tr th,
     table tfoot tr th,
     table tbody tr td {
-        @apply py-3 px-4 ltr:text-left rtl:text-right;
+        @apply py-3.5 px-4 ltr:text-left rtl:text-right;
     }
     table thead tr th,
     table tfoot tr th {
-        @apply font-semibold;
+        @apply text-xs font-semibold uppercase tracking-wider text-white-dark;
     }
     table tbody tr {
-        @apply border-b !border-white-light/40 dark:!border-[#191e3a];
+        @apply border-b !border-[#f1f2f6] dark:!border-[#191e3a];
     }
     table.table-hover tbody tr {
-        @apply hover:!bg-white-light/20 dark:hover:!bg-[#1a2941]/40;
+        @apply transition-colors duration-150 hover:!bg-primary/[0.03] dark:hover:!bg-white/[0.02];
     }
     table.table-striped tbody tr:nth-child(odd) {
         @apply !bg-white-light/20 dark:!bg-[#1a2941]/40;
@@ -437,15 +474,16 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
     }
 
     /*
-       Stacking table: on phones each row becomes a card and every cell is
-       labelled from its data-label. Add .table-stack to the <table>.
+       Stacking table: on phones AND tablets each row becomes a card, labelled
+       from its data-label. Add .table-stack to the <table>. The full table
+       only returns at lg (≥1024px) where there's room for every column.
     */
-    @media (max-width: 767px) {
+    @media (max-width: 1023px) {
         table.table-stack thead {
             @apply hidden;
         }
         table.table-stack tbody tr {
-            @apply block mb-3 rounded-lg border border-white-light bg-white p-3 shadow-sm dark:border-[#1b2e4b] dark:bg-[#0e1726];
+            @apply block mb-3 rounded-xl border border-white-light bg-white p-4 shadow-sm dark:border-[#1b2e4b] dark:bg-[#0e1726];
         }
         /* Default: stack as a plain readable block. */
         table.table-stack tbody tr td {
@@ -470,6 +508,22 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
         }
         table.table-stack tbody tr td.cell-empty::before {
             @apply hidden;
+        }
+    }
+
+    /* On tablets, flow the row-cards two-up to use the wider screen. */
+    @media (min-width: 640px) and (max-width: 1023px) {
+        table.table-stack {
+            @apply block;
+        }
+        table.table-stack tbody {
+            @apply grid grid-cols-2 gap-3;
+        }
+        table.table-stack tbody tr {
+            @apply mb-0 h-full;
+        }
+        table.table-stack tbody tr:has(td.cell-empty) {
+            @apply col-span-2;
         }
     }
 

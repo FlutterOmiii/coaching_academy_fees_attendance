@@ -68,20 +68,21 @@
     <nav x-data="sidebar"
         class="sidebar fixed min-h-screen h-full top-0 bottom-0 w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] z-50 transition-all duration-300">
         <div class="bg-white dark:bg-[#0e1726] h-full">
-            <div class="flex items-center justify-between px-4 py-3">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 main-logo shrink-0">
-                    <span class="grid w-10 h-10 rounded-full shrink-0 place-content-center bg-primary/10">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" class="text-primary">
+            <div class="flex items-center justify-between px-4 py-3 overflow-hidden">
+                <a href="{{ route('admin.dashboard') }}" title="{{ \App\Models\Setting::get('academy_name', 'Cricket Academy') }}"
+                    class="flex items-center min-w-0 gap-2 main-logo shrink">
+                    <span class="grid rounded-full w-9 h-9 shrink-0 place-content-center bg-primary/10">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-primary">
                             <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" />
                             <path d="M12 3C12 3 9 7 9 12C9 17 12 21 12 21M12 3C12 3 15 7 15 12C15 17 12 21 12 21"
                                 stroke="currentColor" stroke-width="1.5" />
                         </svg>
                     </span>
                     <span
-                        class="text-lg font-bold align-middle lg:inline dark:text-white-light leading-tight">{{ \App\Models\Setting::get('academy_name', 'Cricket Academy') }}</span>
+                        class="text-[15px] font-bold align-middle truncate lg:inline dark:text-white-light leading-tight">{{ \App\Models\Setting::get('academy_name', 'Cricket Academy') }}</span>
                 </a>
                 <a href="javascript:;"
-                    class="flex items-center w-8 h-8 transition duration-300 rounded-full collapse-icon hover:bg-gray-500/10 dark:hover:bg-dark-light/10 dark:text-white-light rtl:rotate-180"
+                    class="hidden items-center w-8 h-8 transition duration-300 rounded-full collapse-icon hover:bg-gray-500/10 dark:hover:bg-dark-light/10 dark:text-white-light rtl:rotate-180"
                     @click="$store.app.toggleSidebar()">
                     <svg class="w-5 h-5 m-auto" width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M13 19L7 12L13 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"

@@ -7,7 +7,7 @@
     <title>{{ $title ?? 'Admin Panel' }}</title>
 
     <meta name='viewport' content='width=device-width, initial-scale=1' />
-    <link rel="icon" type="image/svg" href="/assets/images/logo.png" />
+    <link rel="icon" type="image/svg" href="/favicon.svg" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />

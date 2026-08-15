@@ -11,11 +11,11 @@ class SettingSeeder extends Seeder
     {
         $settings = [
             'academy' => [
-                'academy_name' => 'Nexstep Cricket Academy',
+                'academy_name' => 'Mumbai Cricket Academy',
                 'academy_tagline' => 'Building cricketers, building character',
-                'academy_email' => 'info@nexstepcricket.com',
+                'academy_email' => 'info@mumbaicricketacademy.com',
                 'academy_phone' => '+91 98765 00000',
-                'academy_address' => 'Sports Complex Road, Kothrud, Pune, Maharashtra 411038',
+                'academy_address' => 'Mumbai, Maharashtra',
                 'academy_established' => '2014',
             ],
             'finance' => [

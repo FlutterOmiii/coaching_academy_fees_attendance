@@ -2,11 +2,15 @@
     <div class="shadow-sm">
         <div class="relative bg-white flex w-full items-center px-5 py-2.5 dark:bg-[#0e1726]">
             <div class="flex items-center justify-between horizontal-logo lg:hidden ltr:mr-2 rtl:ml-2">
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center main-logo shrink-0">
-                    <img x-show="$store.app.theme !== 'dark'" x-transition.opacity class="inline w-8"
-                        src="/assets/images/logo.png" alt="light" />
-                    <img x-show="$store.app.theme === 'dark'" x-transition.opacity class="inline w-8"
-                        src="/assets/images/logo-dark.png" alt="dark" />
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 main-logo shrink-0">
+                    <span class="grid rounded-full w-9 h-9 shrink-0 place-content-center bg-primary/10">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-primary">
+                            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" />
+                            <path d="M12 3C12 3 9 7 9 12C9 17 12 21 12 21M12 3C12 3 15 7 15 12C15 17 12 21 12 21"
+                                stroke="currentColor" stroke-width="1.5" />
+                        </svg>
+                    </span>
+                    <span class="text-base font-bold leading-tight truncate max-w-[44vw] dark:text-white-light">{{ \App\Models\Setting::get('academy_name', 'Cricket Academy') }}</span>
                 </a>
 
                 <a href="javascript:;"

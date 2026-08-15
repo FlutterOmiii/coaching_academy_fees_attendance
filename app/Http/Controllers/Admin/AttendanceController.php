@@ -9,6 +9,7 @@ use App\Models\CoachAttendance;
 use App\Models\Student;
 use App\Models\StudentAttendance;
 use App\Models\TrainingSession;
+use App\Services\AttendancePriority;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +38,6 @@ class AttendanceController extends Controller
             // is what the mark is attributed to.
             $students = Student::active()->approved()
                 ->with('activeBatches:id,name')
-                ->orderBy('first_name')
                 ->get()
                 ->filter(fn ($s) => $s->activeBatches->isNotEmpty())
                 ->values();
@@ -52,7 +52,7 @@ class AttendanceController extends Controller
             $batch = Batch::with('activeStudents')->find($batchId);
 
             if ($batch) {
-                $students = $batch->activeStudents()->orderBy('first_name')->get();
+                $students = $batch->activeStudents()->get();
 
                 $existing = StudentAttendance::where('batch_id', $batch->id)
                     ->whereDate('attendance_date', $date)
@@ -63,6 +63,10 @@ class AttendanceController extends Controller
                 $isTrainingDay = in_array($date->dayOfWeek, $batch->training_days ?? [], true);
             }
         }
+
+        // Regular Student Priority — most-likely-to-attend first. Screen order
+        // only; the students' registration order is never touched.
+        $students = AttendancePriority::order($students, $batchId, $date instanceof Carbon ? $date : Carbon::parse($date));
 
         return view('admin.attendance.index', [
             'batches' => $batches,
@@ -83,7 +87,9 @@ class AttendanceController extends Controller
         $rules = [
             'attendance_date' => 'required|date|before_or_equal:today',
             'attendance' => 'required|array|min:1',
-            'attendance.*' => 'required|in:present,absent,late,excused',
+            // Two states. Anyone not explicitly Present is saved Absent, so an
+            // empty/unmarked value is allowed and coerced to absent below.
+            'attendance.*' => 'nullable|in:present,absent',
             'remarks' => 'array',
         ];
 
@@ -106,6 +112,9 @@ class AttendanceController extends Controller
             $sessionByBatch = [];
 
             foreach ($data['attendance'] as $studentId => $status) {
+                // Present only when explicitly tapped; everyone else is Absent.
+                $status = $status === 'present' ? 'present' : 'absent';
+
                 $batchId = $allMode
                     ? ($request->input("student_batch.{$studentId}"))
                     : $data['batch_id'];
@@ -120,6 +129,8 @@ class AttendanceController extends Controller
                         ->value('id');
                 }
 
+                // updateOrCreate on the (student, batch, date) unique key makes
+                // this idempotent — re-saving edits the same row, never a duplicate.
                 StudentAttendance::updateOrCreate(
                     [
                         'student_id' => $studentId,
@@ -129,7 +140,7 @@ class AttendanceController extends Controller
                     [
                         'training_session_id' => $sessionByBatch[$batchId],
                         'status' => $status,
-                        'check_in' => in_array($status, ['present', 'late'], true) ? now()->format('H:i:s') : null,
+                        'check_in' => $status === 'present' ? now()->format('H:i:s') : null,
                         'remarks' => $request->input("remarks.{$studentId}"),
                         'marked_by' => $adminId,
                     ]
@@ -139,7 +150,46 @@ class AttendanceController extends Controller
             }
         });
 
-        return back()->with('success', $marked.' students marked for '.$date->format('d M Y').'.');
+        // Straight into the daily chart: Present first (green), Absent after (red).
+        return redirect()
+            ->route('admin.attendance.daily', ['batch_id' => $request->input('batch_id'), 'date' => $date->toDateString()])
+            ->with('success', "Attendance saved — {$marked} students marked for ".$date->format('d M Y').'.');
+    }
+
+    /**
+     * Daily chart for one date: Present students first (green), Absent after
+     * (red), never mixed. This is where saving lands.
+     */
+    public function daily(Request $request)
+    {
+        $batches = Batch::active()->orderBy('name')->get();
+        $batchId = $request->input('batch_id', 'all');
+        $date = $request->date('date') ?? Carbon::today();
+        $allMode = $batchId === 'all';
+
+        $records = StudentAttendance::query()
+            ->with(['student:id,first_name,last_name,student_code,photo', 'batch:id,name'])
+            ->whereDate('attendance_date', $date)
+            ->when(! $allMode, fn ($q) => $q->where('batch_id', $batchId))
+            ->get()
+            ->filter(fn ($r) => $r->student !== null);
+
+        $isPresent = fn ($r) => in_array($r->status, StudentAttendance::PRESENT_STATUSES, true);
+
+        $present = $records->filter($isPresent)
+            ->sortBy(fn ($r) => mb_strtolower($r->student->full_name))->values();
+        $absent = $records->reject($isPresent)
+            ->sortBy(fn ($r) => mb_strtolower($r->student->full_name))->values();
+
+        return view('admin.attendance.daily', [
+            'batches' => $batches,
+            'batchId' => $batchId,
+            'allMode' => $allMode,
+            'date' => $date,
+            'present' => $present,
+            'absent' => $absent,
+            'batch' => $allMode ? null : $batches->firstWhere('id', (int) $batchId),
+        ]);
     }
 
     /** Monthly grid: one row per student, one column per day. */

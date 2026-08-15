@@ -406,15 +406,27 @@
                     });
                 }
 
-                render('#chartAttendance', {
-                    ...base(),
-                    series: charts.attendance.data,
-                    chart: { ...base().chart, type: 'donut', height: 300 },
-                    labels: charts.attendance.labels,
-                    colors: [COLORS.success, COLORS.warning, COLORS.danger, COLORS.info],
-                    legend: { position: 'bottom' },
-                    plotOptions: { pie: { donut: { size: '65%' } } },
-                });
+                // Only draw the donut when there's data — otherwise show a clean empty state.
+                const attTotal = (charts.attendance.data || []).reduce((a, b) => a + Number(b || 0), 0);
+                if (attTotal > 0) {
+                    render('#chartAttendance', {
+                        ...base(),
+                        series: charts.attendance.data,
+                        chart: { ...base().chart, type: 'donut', height: 300 },
+                        labels: charts.attendance.labels,
+                        colors: [COLORS.success, COLORS.warning, COLORS.danger, COLORS.info],
+                        legend: { position: 'bottom' },
+                        plotOptions: { pie: { donut: { size: '65%' } } },
+                    });
+                } else {
+                    const el = document.querySelector('#chartAttendance');
+                    if (el) el.innerHTML =
+                        '<div class="flex flex-col items-center justify-center text-center" style="height:300px">' +
+                        '<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" class="mb-3 text-white-dark opacity-50"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+                        '<p class="text-sm font-semibold text-white-dark">No attendance marked yet</p>' +
+                        '<p class="mt-0.5 text-xs text-white-dark/70">Sessions marked this month will show here.</p>' +
+                        '</div>';
+                }
 
                 render('#chartAttendanceTrend', {
                     ...base(),
