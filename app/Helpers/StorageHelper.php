@@ -40,7 +40,10 @@ class StorageHelper
         }
 
         if (self::disk() === 'public') {
-            return Storage::disk('public')->url($path);
+            // Build from the current request host rather than APP_URL, so the
+            // image loads whether the app is browsed via localhost, 127.0.0.1,
+            // a LAN IP or the production domain.
+            return url('storage/'.ltrim($path, '/'));
         }
 
         $endpoint = rtrim((string) config('filesystems.disks.e2e.endpoint', ''), '/');

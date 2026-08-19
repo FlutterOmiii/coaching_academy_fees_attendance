@@ -34,7 +34,7 @@ return new class extends Migration
             $table->string('guardian_relation', 50)->nullable();
 
             // Cricket profile
-            $table->enum('playing_role', ['batsman', 'bowler', 'all_rounder', 'wicket_keeper'])->default('batsman');
+            $table->enum('playing_role', ['batter', 'bowler', 'batting_allrounder', 'bowling_allrounder', 'wicket_keeper'])->default('batter');
             $table->enum('batting_style', ['right_hand', 'left_hand'])->nullable();
             $table->enum('bowling_style', [
                 'right_arm_fast', 'right_arm_medium', 'right_arm_off_spin', 'right_arm_leg_spin',

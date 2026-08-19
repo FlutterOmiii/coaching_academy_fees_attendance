@@ -22,14 +22,15 @@ class Expense extends Model
     ];
 
     protected $fillable = [
-        'expense_category_id', 'title', 'amount', 'expense_date', 'payment_method',
-        'vendor', 'reference_no', 'notes', 'created_by',
+        'expense_category_id', 'coach_id', 'salary_month', 'title', 'amount',
+        'expense_date', 'payment_method', 'vendor', 'reference_no', 'notes', 'created_by',
     ];
 
     protected function casts(): array
     {
         return [
             'expense_date' => 'date',
+            'salary_month' => 'date',
             'amount' => 'decimal:2',
         ];
     }
@@ -41,12 +42,24 @@ class Expense extends Model
         return $this->belongsTo(ExpenseCategory::class, 'expense_category_id');
     }
 
+    /** Set only on coach-salary payments. */
+    public function coach(): BelongsTo
+    {
+        return $this->belongsTo(Coach::class);
+    }
+
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(Admin::class, 'created_by');
     }
 
     // ------------------------------------------------------------------ Scopes
+
+    /** Only coach-salary payments. */
+    public function scopeSalaries(Builder $query): Builder
+    {
+        return $query->whereNotNull('coach_id');
+    }
 
     public function scopeForMonth(Builder $query, $year, $month): Builder
     {

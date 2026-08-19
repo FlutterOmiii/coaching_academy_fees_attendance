@@ -19,7 +19,7 @@
     <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
             <h1 class="text-2xl font-extrabold dark:text-white-light">
-                Welcome back, {{ explode(' ', auth('admin')->user()->name)[0] }} 👋
+                Welcome back, {{ explode(' ', auth('admin')->user()->name)[0] }} Sir 👋
             </h1>
             <p class="mt-1 text-white-dark">
                 {{ \App\Models\Setting::get('academy_name', 'Cricket Academy') }} &middot;
@@ -30,6 +30,46 @@
             {{ auth('admin')->user()->role_label }}
         </span>
     </div>
+
+    {{-- 🎂 Birthday heads-up: shows on the day and the day before (admin only). --}}
+    @php
+        $bdayToday = $birthdays->where('is_today', true);
+        $bdayTomorrow = $birthdays->where('is_tomorrow', true);
+    @endphp
+    @if ($bdayToday->isNotEmpty() || $bdayTomorrow->isNotEmpty())
+        <div class="p-4 mb-5 rounded-md border border-warning/40 bg-gradient-to-r from-warning/15 to-danger/10 sm:mb-6">
+            @foreach ($bdayToday as $row)
+                <div class="flex flex-wrap items-center gap-2 py-1">
+                    <span class="text-xl">🎂</span>
+                    <span class="font-bold dark:text-white-light">
+                        <a href="{{ route('admin.students.show', $row['student']) }}" class="hover:text-primary">
+                            {{ $row['student']->full_name }}
+                        </a>
+                        turns {{ $row['turning'] }} today!
+                    </span>
+                    <span class="badge bg-danger text-white text-[10px] font-bold uppercase">Today</span>
+                    <span class="text-xs text-white-dark">{{ $row['student']->student_code }}
+                        @if ($row['student']->batches->isNotEmpty()) · {{ $row['student']->batches->first()->name }} @endif
+                    </span>
+                </div>
+            @endforeach
+            @foreach ($bdayTomorrow as $row)
+                <div class="flex flex-wrap items-center gap-2 py-1">
+                    <span class="text-xl">🎈</span>
+                    <span class="font-semibold dark:text-white-light">
+                        <a href="{{ route('admin.students.show', $row['student']) }}" class="hover:text-primary">
+                            {{ $row['student']->full_name }}
+                        </a>
+                        turns {{ $row['turning'] }} tomorrow ({{ $row['date']->format('d M') }})
+                    </span>
+                    <span class="badge bg-warning text-white text-[10px] font-bold uppercase">Tomorrow</span>
+                    <span class="text-xs text-white-dark">{{ $row['student']->student_code }}
+                        @if ($row['student']->batches->isNotEmpty()) · {{ $row['student']->batches->first()->name }} @endif
+                    </span>
+                </div>
+            @endforeach
+        </div>
+    @endif
 
     {{-- Fee Overview: the four fee numbers plus one-tap actions. --}}
     @if ($showFinance && $feeOverview)
@@ -237,7 +277,55 @@
     </div>
 
     {{-- Lists --}}
-    <div class="grid grid-cols-1 gap-4 mb-5 sm:gap-6 sm:mb-6">
+    <div class="grid grid-cols-1 gap-4 mb-5 sm:gap-6 sm:mb-6 {{ $birthdays->isNotEmpty() ? 'lg:grid-cols-2' : '' }}">
+        @if ($birthdays->isNotEmpty())
+            {{-- Monthly birthday list: admin-only, today/tomorrow highlighted. --}}
+            <div class="panel h-full">
+                <div class="flex items-center justify-between mb-5">
+                    <h5 class="text-lg font-semibold dark:text-white-light">🎂 Birthdays · {{ now()->format('F') }}</h5>
+                    <a href="{{ route('admin.students.birthdays') }}" class="text-xs font-semibold text-primary hover:underline">
+                        All months →
+                    </a>
+                </div>
+                <div class="overflow-y-auto max-h-96">
+                    @foreach ($birthdays as $row)
+                        @php $s = $row['student']; @endphp
+                        <div class="flex items-center gap-3 py-2.5 border-b border-white-light dark:border-[#1b2e4b] last:border-0 rounded-md px-2 -mx-2
+                            {{ $row['is_today'] ? 'bg-danger/10' : ($row['is_tomorrow'] ? 'bg-warning/10' : '') }}">
+                            @if ($s->photo)
+                                <img src="{{ \App\Helpers\StorageHelper::url($s->photo) }}" alt=""
+                                    class="object-cover w-9 h-9 rounded-full shrink-0" />
+                            @else
+                                <span class="grid w-9 h-9 text-xs font-bold rounded-full shrink-0 place-content-center bg-primary/10 text-primary">
+                                    {{ strtoupper(substr($s->first_name, 0, 1) . substr($s->last_name, 0, 1)) }}
+                                </span>
+                            @endif
+                            <div class="flex-1 min-w-0 {{ $row['is_past'] ? 'opacity-60' : '' }}">
+                                <a href="{{ route('admin.students.show', $s) }}"
+                                    class="font-semibold truncate dark:text-white-light hover:text-primary">
+                                    {{ $s->full_name }}
+                                </a>
+                                <div class="text-xs text-white-dark">
+                                    {{ $s->student_code }}
+                                    @if ($s->batches->isNotEmpty()) · {{ $s->batches->first()->name }} @endif
+                                    · turns {{ $row['turning'] }}
+                                </div>
+                            </div>
+                            @if ($row['is_today'])
+                                <span class="badge bg-danger text-white text-[10px] font-bold uppercase shrink-0">🎂 Today</span>
+                            @elseif ($row['is_tomorrow'])
+                                <span class="badge bg-warning text-white text-[10px] font-bold uppercase shrink-0">Tomorrow</span>
+                            @else
+                                <span class="text-sm font-bold shrink-0 {{ $row['is_past'] ? 'text-white-dark' : 'dark:text-white-light' }}">
+                                    {{ $row['date']->format('d M') }}
+                                </span>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
         <div class="panel h-full">
             <h5 class="mb-5 text-lg font-semibold dark:text-white-light">Upcoming Events</h5>
             @forelse ($upcomingEvents as $event)

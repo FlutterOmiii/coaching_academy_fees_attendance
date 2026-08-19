@@ -49,7 +49,7 @@ return new class extends Migration
             $table->unsignedSmallInteger('jersey_number')->nullable();
             $table->boolean('is_captain')->default(false);
             $table->boolean('is_vice_captain')->default(false);
-            $table->enum('role', ['batsman', 'bowler', 'all_rounder', 'wicket_keeper'])->nullable();
+            $table->enum('role', ['batter', 'bowler', 'batting_allrounder', 'bowling_allrounder', 'wicket_keeper'])->nullable();
             $table->timestamps();
 
             $table->unique(['team_id', 'student_id']);

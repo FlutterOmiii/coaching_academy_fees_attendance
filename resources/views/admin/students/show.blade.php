@@ -11,6 +11,7 @@
 
     <x-admin.page-header :title="$student->full_name" :subtitle="$student->student_code . ' · ' . $student->age . ' yrs · ' . $student->playing_role_label" :breadcrumbs="$crumbs">
         <x-slot:actions>
+            <a href="{{ route('admin.students.admission', $student) }}" class="btn btn-outline-info btn-sm">📄 Admission Form</a>
             <form method="POST" action="{{ route('admin.students.toggle-status', $student) }}">
                 @csrf @method('PATCH')
                 <button class="btn btn-sm {{ $student->status === 'active' ? 'btn-outline-warning' : 'btn-outline-success' }}">
@@ -22,6 +23,34 @@
 @endability
         </x-slot:actions>
     </x-admin.page-header>
+
+    {{-- Just registered: one tap sends the admission form to the guardian. --}}
+    @if (session('admission_wa'))
+        @php $waAdmission = session('admission_wa'); @endphp
+        <div class="flex flex-wrap items-center justify-between gap-3 p-4 mb-6 rounded-md bg-success/10 border border-success/30"
+            x-data="{ shown: true }" x-show="shown">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">🎉</span>
+                <div>
+                    <p class="font-bold text-success">Admission complete!</p>
+                    <p class="text-xs text-white-dark">
+                        Send the official Admission Form to {{ $waAdmission['guardian'] }} on WhatsApp.
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                @if ($waAdmission['link'])
+                    <a href="{{ $waAdmission['link'] }}" target="_blank" rel="noopener" class="btn btn-success">
+                        💬 Send Admission Form on WhatsApp
+                    </a>
+                @else
+                    <span class="text-xs text-white-dark">No valid guardian mobile number on file.</span>
+                @endif
+                <a href="{{ route('admin.students.admission', $student) }}" class="btn btn-outline-info">View Form</a>
+                <button type="button" @click="shown = false" class="text-xl leading-none text-white-dark hover:text-danger">&times;</button>
+            </div>
+        </div>
+    @endif
 
     {{-- Admission approval banner --}}
     @if ($student->admission_status === 'pending')

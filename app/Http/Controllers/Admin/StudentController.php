@@ -6,10 +6,14 @@ use App\Helpers\StorageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Batch;
 use App\Models\BatchTransfer;
+use App\Models\Setting;
 use App\Models\Student;
 use App\Models\StudentDocument;
+use App\Support\WhatsApp;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 
 class StudentController extends Controller
 {
@@ -70,7 +74,123 @@ class StudentController extends Controller
 
         return redirect()
             ->route('admin.students.show', $student)
-            ->with('success', "Student {$student->student_code} registered successfully.");
+            ->with('success', "Student {$student->student_code} registered successfully.")
+            ->with('admission_wa', [
+                'guardian' => $student->guardian_name,
+                'link' => $this->admissionWhatsAppLink($student),
+            ]);
+    }
+
+    // ----------------------------------------------------------- Birthdays
+
+    /**
+     * Month-by-month birthday list of every student (admin-only info page).
+     * Includes inactive students, dimmed, so no birthday is ever missed.
+     */
+    public function birthdays(Request $request)
+    {
+        $month = min(12, max(1, (int) $request->input('month', now()->month)));
+        $year = now()->year;
+        $academy = Setting::get('academy_name', 'Cricket Academy');
+
+        $rows = Student::query()
+            ->whereNotNull('date_of_birth')
+            ->whereMonth('date_of_birth', $month)
+            ->with('activeBatches:id,name')
+            ->orderByRaw('DAY(date_of_birth)')
+            ->orderBy('first_name')
+            ->get()
+            ->map(function (Student $s) use ($month, $year, $academy) {
+                // This year's occurrence; 29 Feb clamps to 28 in non-leap years.
+                $bday = Carbon::create($year, $month, min(
+                    $s->date_of_birth->day,
+                    Carbon::create($year, $month)->daysInMonth
+                ));
+
+                $wish = implode("\n", [
+                    'Dear '.$s->guardian_name.',',
+                    '',
+                    '🎂 *'.$academy.'* wishes '.$s->full_name.' a very *Happy Birthday!*',
+                    'May the year ahead be filled with runs, wickets and wonderful memories on the pitch. 🏏',
+                    '',
+                    'Warm wishes,',
+                    '— '.$academy,
+                ]);
+
+                return [
+                    'student' => $s,
+                    'date' => $bday,
+                    'turning' => $year - $s->date_of_birth->year,
+                    'is_today' => $bday->isToday(),
+                    'is_tomorrow' => $bday->isTomorrow(),
+                    'wa_link' => WhatsApp::link($s->guardian_phone, $wish),
+                ];
+            });
+
+        // Per-month totals for the tab strip.
+        $counts = Student::whereNotNull('date_of_birth')
+            ->selectRaw('MONTH(date_of_birth) m, COUNT(*) c')
+            ->groupBy('m')
+            ->pluck('c', 'm');
+
+        return view('admin.students.birthdays', [
+            'month' => $month,
+            'rows' => $rows,
+            'counts' => $counts,
+            'missingDob' => Student::whereNull('date_of_birth')->count(),
+        ]);
+    }
+
+    // ------------------------------------------------------- Admission form
+
+    /** The printable admission document, inside the admin panel. */
+    public function admissionForm(Student $student)
+    {
+        return view('admin.students.admission-form', [
+            'student' => $student->load('activeBatches.coach'),
+            'public' => false,
+            'waLink' => $this->admissionWhatsAppLink($student),
+        ]);
+    }
+
+    /** Guardian view of the same document, reached via the signed WhatsApp link. */
+    public function admissionFormPublic(Student $student)
+    {
+        return view('admin.students.admission-form', [
+            'student' => $student->load('activeBatches.coach'),
+            'public' => true,
+            'waLink' => null,
+        ]);
+    }
+
+    /** WhatsApp welcome message to the guardian, carrying the signed form link. */
+    private function admissionWhatsAppLink(Student $student): ?string
+    {
+        $academy = Setting::get('academy_name', 'Cricket Academy');
+        $batch = $student->activeBatches()->first();
+
+        $lines = [
+            'Dear '.$student->guardian_name.',',
+            '',
+            'Welcome to *'.$academy.'*! 🏏',
+            'We are delighted to confirm the admission of *'.$student->full_name.'*.',
+            '',
+            'Admission No: '.$student->student_code,
+            'Date of Admission: '.$student->admission_date?->format('d M Y'),
+        ];
+
+        if ($batch) {
+            $lines[] = 'Batch: '.$batch->name;
+        }
+
+        $lines[] = '';
+        $lines[] = 'You can view and save the official Admission Form here:';
+        $lines[] = URL::signedRoute('admission.view', ['student' => $student->id]);
+        $lines[] = '';
+        $lines[] = 'We look forward to a wonderful cricketing journey together! 🙏';
+        $lines[] = '— '.$academy;
+
+        return WhatsApp::link($student->guardian_phone, implode("\n", $lines));
     }
 
     public function show(Student $student)
@@ -277,9 +397,8 @@ class StudentController extends Controller
 
     private function validated(Request $request, ?Student $student = null): array
     {
-        return $request->validate([
-            'first_name' => 'required|string|max:100',
-            'last_name' => 'required|string|max:100',
+        $data = $request->validate([
+            'full_name' => 'required|string|max:150',
             'date_of_birth' => 'required|date|before:today',
             'gender' => 'required|in:male,female,other',
             'blood_group' => 'nullable|string|max:5',
@@ -295,7 +414,7 @@ class StudentController extends Controller
             'guardian_phone' => 'required|string|max:20',
             'guardian_email' => 'nullable|email|max:255',
             'guardian_relation' => 'nullable|string|max:50',
-            'playing_role' => 'required|in:batsman,bowler,all_rounder,wicket_keeper',
+            'playing_role' => 'required|in:'.implode(',', array_keys(Student::PLAYING_ROLES)),
             'batting_style' => 'nullable|in:right_hand,left_hand',
             'bowling_style' => 'nullable|in:right_arm_fast,right_arm_medium,right_arm_off_spin,right_arm_leg_spin,left_arm_fast,left_arm_medium,left_arm_orthodox,left_arm_chinaman,none',
             'admission_date' => 'required|date',
@@ -304,5 +423,11 @@ class StudentController extends Controller
             'medical_notes' => 'nullable|string',
             'notes' => 'nullable|string',
         ]);
+
+        // One Full Name field on the form → first/last columns in the DB.
+        $data = $this->splitFullName($data['full_name']) + $data;
+        unset($data['full_name']);
+
+        return $data;
     }
 }

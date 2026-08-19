@@ -36,14 +36,10 @@
         <div class="panel">
             <h5 class="mb-5 text-lg font-semibold dark:text-white-light">Personal Details</h5>
             <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-                <x-admin.field label="First Name" name="first_name" :required="true">
-                    <input type="text" name="first_name" id="first_name" class="form-input"
-                        value="{{ old('first_name', $student->first_name) }}" required />
-                </x-admin.field>
-
-                <x-admin.field label="Last Name" name="last_name" :required="true">
-                    <input type="text" name="last_name" id="last_name" class="form-input"
-                        value="{{ old('last_name', $student->last_name) }}" required />
+                <x-admin.field label="Full Name" name="full_name" :required="true">
+                    <input type="text" name="full_name" id="full_name" class="form-input"
+                        value="{{ old('full_name', trim($student->first_name . ' ' . $student->last_name)) }}"
+                        placeholder="e.g. Rahul Sharma" required />
                 </x-admin.field>
 
                 <x-admin.field label="Date of Birth" name="date_of_birth" :required="true">
@@ -71,47 +67,6 @@
         </div>
 
         {{-- Contact --}}
-        <div class="panel">
-            <h5 class="mb-5 text-lg font-semibold dark:text-white-light">Contact & Address</h5>
-            <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-                <x-admin.field label="Email" name="email">
-                    <input type="email" name="email" id="email" class="form-input"
-                        value="{{ old('email', $student->email) }}" />
-                </x-admin.field>
-
-                <x-admin.field label="Phone" name="phone">
-                    <input type="text" name="phone" id="phone" class="form-input"
-                        value="{{ old('phone', $student->phone) }}" />
-                </x-admin.field>
-
-                <x-admin.field label="School" name="school_name">
-                    <input type="text" name="school_name" id="school_name" class="form-input"
-                        value="{{ old('school_name', $student->school_name) }}" />
-                </x-admin.field>
-
-                <x-admin.field label="Address" name="address">
-                    <input type="text" name="address" id="address" class="form-input"
-                        value="{{ old('address', $student->address) }}" />
-                </x-admin.field>
-
-                <x-admin.field label="City" name="city">
-                    <input type="text" name="city" id="city" class="form-input"
-                        value="{{ old('city', $student->city ?? 'Pune') }}" />
-                </x-admin.field>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <x-admin.field label="State" name="state">
-                        <input type="text" name="state" id="state" class="form-input"
-                            value="{{ old('state', $student->state ?? 'Maharashtra') }}" />
-                    </x-admin.field>
-                    <x-admin.field label="Pincode" name="pincode">
-                        <input type="text" name="pincode" id="pincode" class="form-input"
-                            value="{{ old('pincode', $student->pincode) }}" />
-                    </x-admin.field>
-                </div>
-            </div>
-        </div>
-
         {{-- Guardian --}}
         <div class="panel">
             <h5 class="mb-5 text-lg font-semibold dark:text-white-light">Guardian</h5>
@@ -220,6 +175,48 @@
                 <x-admin.field label="Notes" name="notes">
                     <textarea name="notes" id="notes" rows="2" class="form-textarea">{{ old('notes', $student->notes) }}</textarea>
                 </x-admin.field>
+            </div>
+        </div>
+
+        {{-- Contact & Address --}}
+        <div class="panel">
+            <h5 class="mb-5 text-lg font-semibold dark:text-white-light">Contact & Address</h5>
+            <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
+                <x-admin.field label="Email" name="email">
+                    <input type="email" name="email" id="email" class="form-input"
+                        value="{{ old('email', $student->email) }}" />
+                </x-admin.field>
+
+                <x-admin.field label="Phone" name="phone">
+                    <input type="text" name="phone" id="phone" class="form-input"
+                        value="{{ old('phone', $student->phone) }}" />
+                </x-admin.field>
+
+                <x-admin.field label="School" name="school_name">
+                    <input type="text" name="school_name" id="school_name" class="form-input"
+                        value="{{ old('school_name', $student->school_name) }}" />
+                </x-admin.field>
+
+                <x-admin.field label="Address" name="address">
+                    <input type="text" name="address" id="address" class="form-input"
+                        value="{{ old('address', $student->address) }}" />
+                </x-admin.field>
+
+                <x-admin.field label="City" name="city">
+                    <input type="text" name="city" id="city" class="form-input"
+                        value="{{ old('city', $student->city ?? 'Pune') }}" />
+                </x-admin.field>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <x-admin.field label="State" name="state">
+                        <input type="text" name="state" id="state" class="form-input"
+                            value="{{ old('state', $student->state ?? 'Maharashtra') }}" />
+                    </x-admin.field>
+                    <x-admin.field label="Pincode" name="pincode">
+                        <input type="text" name="pincode" id="pincode" class="form-input"
+                            value="{{ old('pincode', $student->pincode) }}" />
+                    </x-admin.field>
+                </div>
             </div>
         </div>
 

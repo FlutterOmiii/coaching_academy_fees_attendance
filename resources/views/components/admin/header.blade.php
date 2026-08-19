@@ -2,14 +2,20 @@
     <div class="shadow-sm">
         <div class="relative bg-white flex w-full items-center px-5 py-2.5 dark:bg-[#0e1726]">
             <div class="flex items-center justify-between horizontal-logo lg:hidden ltr:mr-2 rtl:ml-2">
+                @php $academyLogo = \App\Models\Setting::get('academy_logo'); @endphp
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 main-logo shrink-0">
-                    <span class="grid rounded-full w-9 h-9 shrink-0 place-content-center bg-primary/10">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-primary">
-                            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" />
-                            <path d="M12 3C12 3 9 7 9 12C9 17 12 21 12 21M12 3C12 3 15 7 15 12C15 17 12 21 12 21"
-                                stroke="currentColor" stroke-width="1.5" />
-                        </svg>
-                    </span>
+                    @if ($academyLogo)
+                        <img src="{{ \App\Helpers\StorageHelper::url($academyLogo) }}" alt="Logo"
+                            class="object-contain rounded-lg w-9 h-9 shrink-0" />
+                    @else
+                        <span class="grid rounded-full w-9 h-9 shrink-0 place-content-center bg-primary/10">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-primary">
+                                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" />
+                                <path d="M12 3C12 3 9 7 9 12C9 17 12 21 12 21M12 3C12 3 15 7 15 12C15 17 12 21 12 21"
+                                    stroke="currentColor" stroke-width="1.5" />
+                            </svg>
+                        </span>
+                    @endif
                     <span class="text-base font-bold leading-tight truncate max-w-[44vw] dark:text-white-light">{{ \App\Models\Setting::get('academy_name', 'Cricket Academy') }}</span>
                 </a>
 
@@ -105,6 +111,17 @@
                                 </div>
                             </div>
                         </li>
+                        @ability('settings.manage')
+                            <li class="border-t border-white-light dark:border-white-light/10">
+                                <a href="{{ route('admin.settings.index') }}" class="flex items-center gap-2 px-4 py-3 hover:text-primary">
+                                    <svg class="w-4.5 h-4.5" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
+                                        <path opacity="0.5" d="M12 2C11.068 2 10.602 2 10.235 2.152C9.745 2.355 9.356 2.744 9.153 3.234C9.032 3.527 9.008 3.888 9.003 4.5C8.995 5.451 8.492 6.319 7.669 6.795C6.845 7.271 5.842 7.26 5.009 6.8C4.473 6.504 4.134 6.379 3.82 6.42C3.296 6.489 2.83 6.784 2.549 7.232C2.336 7.572 2.336 8.038 2.336 8.97V15.03C2.336 15.962 2.336 16.428 2.549 16.768C2.83 17.216 3.296 17.511 3.82 17.58C4.134 17.621 4.473 17.496 5.009 17.2C5.842 16.74 6.845 16.729 7.669 17.205C8.492 17.681 8.995 18.549 9.003 19.5C9.008 20.112 9.032 20.473 9.153 20.766C9.356 21.256 9.745 21.645 10.235 21.848C10.602 22 11.068 22 12 22C12.932 22 13.398 22 13.765 21.848C14.255 21.645 14.644 21.256 14.847 20.766C14.968 20.473 14.992 20.112 14.997 19.5C15.005 18.549 15.508 17.681 16.331 17.205C17.155 16.729 18.158 16.74 18.991 17.2C19.527 17.496 19.866 17.621 20.18 17.58C20.704 17.511 21.17 17.216 21.451 16.768C21.664 16.428 21.664 15.962 21.664 15.03V8.97C21.664 8.038 21.664 7.572 21.451 7.232C21.17 6.784 20.704 6.489 20.18 6.42C19.866 6.379 19.527 6.504 18.991 6.8C18.158 7.26 17.155 7.271 16.331 6.795C15.508 6.319 15.005 5.451 14.997 4.5C14.992 3.888 14.968 3.527 14.847 3.234C14.644 2.744 14.255 2.355 13.765 2.152C13.398 2 12.932 2 12 2Z" stroke="currentColor" stroke-width="1.5" />
+                                    </svg>
+                                    Settings
+                                </a>
+                            </li>
+                        @endability
                         <li class="border-t border-white-light dark:border-white-light/10">
                             <form action="{{ route('admin.logout') }}" method="POST">
                                 @csrf

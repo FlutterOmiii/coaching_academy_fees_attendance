@@ -133,9 +133,8 @@ class CoachController extends Controller
     {
         $unique = $coach ? ',' . $coach->id : '';
 
-        return $request->validate([
-            'first_name' => 'required|string|max:100',
-            'last_name' => 'required|string|max:100',
+        $data = $request->validate([
+            'full_name' => 'required|string|max:150',
             'date_of_birth' => 'nullable|date|before:today',
             'gender' => 'required|in:male,female,other',
             'photo' => 'nullable|image|max:2048',
@@ -155,5 +154,11 @@ class CoachController extends Controller
             'bio' => 'nullable|string',
             'status' => 'required|in:active,inactive,on_leave',
         ]);
+
+        // One Full Name field on the form → first/last columns in the DB.
+        $data = $this->splitFullName($data['full_name']) + $data;
+        unset($data['full_name']);
+
+        return $data;
     }
 }

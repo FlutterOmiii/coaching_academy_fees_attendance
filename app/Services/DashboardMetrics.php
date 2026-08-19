@@ -272,6 +272,54 @@ class DashboardMetrics
         return Event::upcoming()->limit($limit)->get();
     }
 
+    /**
+     * This month's student birthdays (admin-only info panel), oldest day first.
+     *
+     * Tomorrow's birthday is always included even when it falls in next month
+     * (e.g. today is 31 Aug, birthday is 1 Sep) so the "day before" heads-up
+     * never slips through the month boundary. Each row carries is_today /
+     * is_tomorrow flags for highlighting, plus the age being turned.
+     */
+    public function birthdays(): Collection
+    {
+        $today = Carbon::today();
+        $tomorrow = $today->copy()->addDay();
+
+        return Student::active()
+            ->whereNotNull('date_of_birth')
+            ->where(function ($q) use ($today, $tomorrow) {
+                $q->whereMonth('date_of_birth', $today->month)
+                    ->orWhere(function ($q) use ($tomorrow) {
+                        $q->whereMonth('date_of_birth', $tomorrow->month)
+                            ->whereDay('date_of_birth', $tomorrow->day);
+                    });
+            })
+            ->with('batches:id,name')
+            ->get(['id', 'first_name', 'last_name', 'student_code', 'date_of_birth', 'photo'])
+            ->map(function (Student $s) use ($today, $tomorrow) {
+                $dob = $s->date_of_birth;
+
+                // This year's occurrence (29 Feb safely becomes 28 Feb in
+                // non-leap years); the next-month overflow lands next year
+                // only when December rolls into January.
+                $year = $dob->month < $today->month && $dob->month === $tomorrow->month
+                    ? $tomorrow->year
+                    : $today->year;
+                $bday = Carbon::create($year, $dob->month, min($dob->day, Carbon::create($year, $dob->month)->daysInMonth));
+
+                return [
+                    'student' => $s,
+                    'date' => $bday,
+                    'turning' => $year - $dob->year,
+                    'is_today' => $bday->isSameDay($today),
+                    'is_tomorrow' => $bday->isSameDay($tomorrow),
+                    'is_past' => $bday->lt($today),
+                ];
+            })
+            ->sortBy(fn ($row) => $row['date']->format('md'))
+            ->values();
+    }
+
     public function recentPayments(int $limit = 5): Collection
     {
         return FeePayment::completed()

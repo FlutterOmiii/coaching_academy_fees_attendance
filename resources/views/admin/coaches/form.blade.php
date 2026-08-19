@@ -21,13 +21,10 @@
         <div class="panel">
             <h5 class="mb-5 text-lg font-semibold dark:text-white-light">Personal Details</h5>
             <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
-                <x-admin.field label="First Name" name="first_name" :required="true">
-                    <input type="text" name="first_name" id="first_name" class="form-input"
-                        value="{{ old('first_name', $coach->first_name) }}" required />
-                </x-admin.field>
-                <x-admin.field label="Last Name" name="last_name" :required="true">
-                    <input type="text" name="last_name" id="last_name" class="form-input"
-                        value="{{ old('last_name', $coach->last_name) }}" required />
+                <x-admin.field label="Full Name" name="full_name" :required="true">
+                    <input type="text" name="full_name" id="full_name" class="form-input"
+                        value="{{ old('full_name', trim($coach->first_name . ' ' . $coach->last_name)) }}"
+                        placeholder="e.g. Vikram Singh" required />
                 </x-admin.field>
                 <x-admin.field label="Date of Birth" name="date_of_birth">
                     <input type="date" name="date_of_birth" id="date_of_birth" class="form-input"

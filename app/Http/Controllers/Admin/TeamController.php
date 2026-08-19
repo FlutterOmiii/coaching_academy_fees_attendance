@@ -85,7 +85,7 @@ class TeamController extends Controller
         $data = $request->validate([
             'student_id' => 'required|exists:students,id',
             'jersey_number' => 'nullable|integer|min:0|max:999',
-            'role' => 'nullable|in:batsman,bowler,all_rounder,wicket_keeper',
+            'role' => 'nullable|in:'.implode(',', array_keys(\App\Models\Student::PLAYING_ROLES)),
             'is_captain' => 'nullable|boolean',
             'is_vice_captain' => 'nullable|boolean',
         ]);

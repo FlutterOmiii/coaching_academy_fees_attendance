@@ -1,5 +1,9 @@
 <x-layout.auth>
-    @php $academy = \App\Models\Setting::get('academy_name', 'Cricket Academy'); @endphp
+    @php
+        $academy = \App\Models\Setting::get('academy_name', 'Cricket Academy');
+        $academyLogo = \App\Models\Setting::get('academy_logo');
+        $academyLogoUrl = $academyLogo ? \App\Helpers\StorageHelper::url($academyLogo) : null;
+    @endphp
     <div x-data="loginForm()">
         <div class="flex items-center justify-center min-h-screen p-4 bg-[#f6f7fb] dark:bg-[#060818]">
 
@@ -20,12 +24,16 @@
 
                         <div class="relative">
                             <div class="flex items-center gap-3 mb-10">
-                                <span class="grid rounded-2xl w-12 h-12 shrink-0 place-content-center bg-white/10 ring-1 ring-white/20 backdrop-blur-sm">
-                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" class="text-white">
-                                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
-                                        <path d="M12 3C12 3 9 7 9 12C9 17 12 21 12 21M12 3C12 3 15 7 15 12C15 17 12 21 12 21"
-                                            stroke="currentColor" stroke-width="1.6" />
-                                    </svg>
+                                <span class="grid overflow-hidden rounded-2xl w-12 h-12 shrink-0 place-content-center bg-white/10 ring-1 ring-white/20 backdrop-blur-sm">
+                                    @if ($academyLogoUrl)
+                                        <img src="{{ $academyLogoUrl }}" alt="Logo" class="object-contain w-12 h-12" />
+                                    @else
+                                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" class="text-white">
+                                            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+                                            <path d="M12 3C12 3 9 7 9 12C9 17 12 21 12 21M12 3C12 3 15 7 15 12C15 17 12 21 12 21"
+                                                stroke="currentColor" stroke-width="1.6" />
+                                        </svg>
+                                    @endif
                                 </span>
                                 <span class="text-lg font-bold tracking-tight text-white">{{ $academy }}</span>
                             </div>
@@ -64,11 +72,15 @@
                         <div class="w-full max-w-md min-w-0 mx-auto">
                             {{-- Compact brand header — phones/tablets only --}}
                             <div class="flex items-center gap-2.5 mb-8 lg:hidden">
-                                <span class="grid rounded-xl w-11 h-11 shrink-0 place-content-center bg-primary/10">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-primary">
-                                        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
-                                        <path d="M12 3C12 3 9 7 9 12C9 17 12 21 12 21M12 3C12 3 15 7 15 12C15 17 12 21 12 21" stroke="currentColor" stroke-width="1.6" />
-                                    </svg>
+                                <span class="grid overflow-hidden rounded-xl w-11 h-11 shrink-0 place-content-center bg-primary/10">
+                                    @if ($academyLogoUrl)
+                                        <img src="{{ $academyLogoUrl }}" alt="Logo" class="object-contain w-11 h-11" />
+                                    @else
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-primary">
+                                            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+                                            <path d="M12 3C12 3 9 7 9 12C9 17 12 21 12 21M12 3C12 3 15 7 15 12C15 17 12 21 12 21" stroke="currentColor" stroke-width="1.6" />
+                                        </svg>
+                                    @endif
                                 </span>
                                 <span class="text-lg font-bold leading-tight tracking-tight text-black dark:text-white">{{ $academy }}</span>
                             </div>

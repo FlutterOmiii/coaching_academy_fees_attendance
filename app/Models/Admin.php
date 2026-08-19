@@ -53,6 +53,9 @@ class Admin extends Authenticatable
             'performance.view', 'performance.manage', 'performance.delete',
             'calendar.view', 'calendar.manage', 'calendar.delete',
             'reports.view',
+            'settings.manage',
+            // Birthday lists are informational and admin-only, like finance.
+            'birthdays.view',
         ],
 
         // Coaching staff: read the academy, run the cricket. No money, no deletes.

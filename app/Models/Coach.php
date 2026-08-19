@@ -105,7 +105,8 @@ class Coach extends Model
         }
 
         return $query->where(function (Builder $q) use ($term) {
-            $q->where('first_name', 'like', "%{$term}%")
+            $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$term}%"])
+                ->orWhere('first_name', 'like', "%{$term}%")
                 ->orWhere('last_name', 'like', "%{$term}%")
                 ->orWhere('coach_code', 'like', "%{$term}%")
                 ->orWhere('phone', 'like', "%{$term}%")

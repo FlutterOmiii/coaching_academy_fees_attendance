@@ -12,7 +12,7 @@ class CoachSeeder extends Seeder
     public function run(): void
     {
         $coaches = [
-            ['Vikram', 'Singh', 'batting', 'BCCI Level 2', 'Former Ranji Trophy batsman', 14, 55000],
+            ['Vikram', 'Singh', 'batting', 'BCCI Level 2', 'Former Ranji Trophy batter', 14, 55000],
             ['Anil', 'Kumble', 'bowling', 'BCCI Level 2', 'Specialist spin bowling coach', 11, 52000],
             ['Suresh', 'Raina', 'fielding', 'BCCI Level 1', 'Fielding and agility specialist', 8, 42000],
             ['Farhan', 'Qureshi', 'wicket_keeping', 'BCCI Level 1', 'Wicket-keeping technique coach', 9, 44000],

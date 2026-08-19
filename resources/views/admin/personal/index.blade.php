@@ -97,6 +97,11 @@
                     <a href="{{ route('admin.personal.index') }}" class="btn btn-outline-danger">Cancel</a>
                 @endif
             </div>
+            {{-- Description, shown under the entry's title in the table. --}}
+            <div class="md:col-span-6">
+                <textarea name="notes" rows="2" maxlength="500" class="form-textarea"
+                    placeholder="Description (optional) — any details you want to remember about this expense">{{ old('notes', $editing?->notes) }}</textarea>
+            </div>
         </form>
     </div>
 

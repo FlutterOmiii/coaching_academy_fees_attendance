@@ -13,7 +13,11 @@ class DashboardController extends Controller
     {
         // Coaches have no finance.view, so money never reaches the response —
         // it is not merely hidden with CSS.
-        $showFinance = (bool) auth('admin')->user()?->hasAbility('finance.view');
+        $admin = auth('admin')->user();
+        $showFinance = (bool) $admin?->hasAbility('finance.view');
+
+        // Birthday heads-up is owner/admin info only.
+        $showBirthdays = (bool) $admin?->hasRole(\App\Models\Admin::ROLE_OWNER, \App\Models\Admin::ROLE_ADMIN);
 
         $charts = [
             'studentGrowth' => $metrics->studentGrowth(),
@@ -37,6 +41,7 @@ class DashboardController extends Controller
             'widgets' => $metrics->widgets(),
             'charts' => $charts,
             'upcomingEvents' => $metrics->upcomingEvents(),
+            'birthdays' => $showBirthdays ? $metrics->birthdays() : collect(),
             'recentPayments' => $showFinance ? $metrics->recentPayments() : collect(),
             'topDefaulters' => $showFinance ? $metrics->topDefaulters() : collect(),
         ]);

@@ -34,7 +34,7 @@ class AssessmentSeeder extends Seeder
                     'student_id' => $student->id,
                     'coach_id' => $coaches[array_rand($coaches)],
                     'assessment_date' => Carbon::now()->subMonths($monthsAgo)->subDays(random_int(0, 20))->toDateString(),
-                    'batting_rating' => $this->rating($base, $student->playing_role === 'batsman'),
+                    'batting_rating' => $this->rating($base, $student->playing_role === 'batter'),
                     'bowling_rating' => $this->rating($base, $student->playing_role === 'bowler'),
                     'fielding_rating' => $this->rating($base, false),
                     'fitness_rating' => $this->rating($base, false),

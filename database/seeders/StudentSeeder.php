@@ -120,12 +120,12 @@ class StudentSeeder extends Seeder
             ? 'inactive'
             : (random_int(1, 100) <= 88 ? 'active' : 'inactive');
 
-        $role = $this->pick(['batsman', 'bowler', 'all_rounder', 'wicket_keeper']);
+        $role = $this->pick(['batter', 'bowler', 'batting_allrounder', 'bowling_allrounder', 'wicket_keeper']);
         $battingStyle = random_int(1, 4) === 1 ? 'left_hand' : 'right_hand';
 
         $bowlingStyle = match ($role) {
             'wicket_keeper' => 'none',
-            'batsman' => $this->pick(['right_arm_medium', 'right_arm_off_spin', 'none']),
+            'batter' => $this->pick(['right_arm_medium', 'right_arm_off_spin', 'none']),
             default => $this->pick([
                 'right_arm_fast', 'right_arm_medium', 'right_arm_off_spin', 'right_arm_leg_spin',
                 'left_arm_fast', 'left_arm_medium', 'left_arm_orthodox',

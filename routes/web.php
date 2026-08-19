@@ -5,16 +5,24 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BatchController;
 use App\Http\Controllers\Admin\CalendarController;
 use App\Http\Controllers\Admin\CoachController;
+use App\Http\Controllers\Admin\CoachSalaryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\FeeController;
 use App\Http\Controllers\Admin\PersonalExpenseController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\TrainingSessionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route('admin.login'));
+
+// Guardian-facing admission form, opened from the WhatsApp welcome message.
+// The signed URL is unguessable and needs no login; it shows only this one
+// student's admission document.
+Route::get('admission/{student}', [StudentController::class, 'admissionFormPublic'])
+    ->middleware('signed')->name('admission.view');
 
 /*
 |--------------------------------------------------------------------------
@@ -43,8 +51,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->middleware('ability:students.create')->name('students.create');
         Route::post('students', [StudentController::class, 'store'])
             ->middleware('ability:students.create')->name('students.store');
+        // Must sit above students/{student} so "birthdays" is not taken as an id.
+        Route::get('students/birthdays', [StudentController::class, 'birthdays'])
+            ->middleware('ability:birthdays.view')->name('students.birthdays');
         Route::get('students/{student}', [StudentController::class, 'show'])
             ->middleware('ability:students.view')->name('students.show');
+        Route::get('students/{student}/admission-form', [StudentController::class, 'admissionForm'])
+            ->middleware('ability:students.view')->name('students.admission');
         Route::get('students/{student}/edit', [StudentController::class, 'edit'])
             ->middleware('ability:students.edit')->name('students.edit');
         Route::put('students/{student}', [StudentController::class, 'update'])
@@ -181,9 +194,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('expenses', [ExpenseController::class, 'index'])->name('expenses.index');
             Route::get('expenses/list', [ExpenseController::class, 'list'])->name('expenses.list');
             Route::get('expenses/categories', [ExpenseController::class, 'categories'])->name('expenses.categories');
+
+            // Coach salaries live inside the expense book (payments are Expenses
+            // tagged with coach_id + salary_month), so they share its abilities.
+            Route::get('expenses/salaries', [CoachSalaryController::class, 'index'])
+                ->name('expenses.salaries');
+            Route::get('expenses/salaries/{coach}', [CoachSalaryController::class, 'history'])
+                ->name('expenses.salaries.history');
         });
 
         Route::middleware('ability:expenses.manage')->group(function () {
+            Route::post('expenses/salaries', [CoachSalaryController::class, 'store'])
+                ->name('expenses.salaries.store');
+            Route::put('expenses/salaries/{coach}/default', [CoachSalaryController::class, 'updateDefault'])
+                ->name('expenses.salaries.default');
             Route::get('expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
             Route::post('expenses', [ExpenseController::class, 'store'])->name('expenses.store');
             Route::get('expenses/{expense}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
@@ -222,6 +246,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Matches, Tournaments, Teams and Performance modules removed from the
         // panel (2026-08-02). Controllers, models and tables remain intact;
         // re-add their routes here to restore.
+
+        // ----------------------------------------------------------- Settings
+        // Academy branding (name, logo, currency, WhatsApp code) + own profile.
+        Route::middleware('ability:settings.manage')->group(function () {
+            Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+            Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+            Route::put('settings/profile', [SettingController::class, 'updateProfile'])
+                ->name('settings.profile');
+        });
 
         // ------------------------------------------------------------ Reports
         Route::middleware('ability:reports.view')->group(function () {

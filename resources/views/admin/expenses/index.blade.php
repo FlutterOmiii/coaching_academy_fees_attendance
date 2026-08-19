@@ -20,6 +20,7 @@
                 class="form-input !py-2 w-auto text-sm"
                 onchange="window.location='{{ route('admin.expenses.index') }}?month='+this.value" />
             <a href="{{ route('admin.expenses.list') }}" class="btn btn-outline-primary btn-sm">All Entries</a>
+            <a href="{{ route('admin.expenses.salaries') }}" class="btn btn-outline-success btn-sm">Coach Salaries</a>
             @if ($canManage)
                 <a href="{{ route('admin.expenses.categories') }}" class="btn btn-outline-info btn-sm">Categories</a>
                 <a href="{{ route('admin.expenses.create') }}" class="btn btn-primary btn-sm">+ Add Expense</a>
