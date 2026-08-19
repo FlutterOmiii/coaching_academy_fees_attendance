@@ -71,6 +71,26 @@
         </div>
     @endif
 
+    {{-- 📢 Start-of-month nudge: send this month's fee reminders (1st → due day). --}}
+    @ability('fees.manage')
+        @php $feeDueDay = max(1, min(28, (int) \App\Models\Setting::get('fee_due_day', 10))); @endphp
+        @if (now()->day <= $feeDueDay)
+            <div class="flex flex-wrap items-center justify-between gap-3 p-4 mb-5 rounded-md bg-primary/10 border border-primary/30 sm:mb-6">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">📢</span>
+                    <div>
+                        <p class="font-bold text-primary">{{ now()->format('F') }} fee reminders</p>
+                        <p class="text-xs text-white-dark">
+                            Fees are due on {{ now()->startOfMonth()->addDays($feeDueDay - 1)->format('d M') }} —
+                            send every parent a humble WhatsApp reminder now.
+                        </p>
+                    </div>
+                </div>
+                <a href="{{ route('admin.fees.reminders') }}" class="btn btn-primary">💬 Send Fee Reminders</a>
+            </div>
+        @endif
+    @endability
+
     {{-- Fee Overview: the four fee numbers plus one-tap actions. --}}
     @if ($showFinance && $feeOverview)
         <div class="panel mb-5 sm:mb-6">

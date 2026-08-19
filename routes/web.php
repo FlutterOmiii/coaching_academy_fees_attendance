@@ -154,6 +154,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::middleware('ability:fees.view')->group(function () {
             Route::get('fees', [FeeController::class, 'index'])->name('fees.index');
             Route::get('fees/pending', [FeeController::class, 'pending'])->name('fees.pending');
+            Route::get('fees/reminders', [FeeController::class, 'reminders'])
+                ->middleware('ability:fees.manage')->name('fees.reminders');
             Route::get('fees/structures', [FeeController::class, 'structures'])->name('fees.structures');
             Route::get('fees/history/{student}', [FeeController::class, 'history'])->name('fees.history');
             Route::get('fees/invoices', [FeeController::class, 'invoices'])->name('fees.invoices');

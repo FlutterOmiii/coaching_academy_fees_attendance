@@ -214,14 +214,15 @@ class FeeInvoice extends Model
         $child = $this->student?->full_name ?: 'your child';
         $amount = $currency.number_format((float) $this->balance_amount);
 
-        return "Dear {$guardian}, 🙏\n\n"
-            ."Warm greetings from {$academy}.\n\n"
-            ."This is a gentle reminder that the fee of {$amount} for {$child} "
-            ."for the month of {$this->period_label} is still remaining.\n\n"
-            ."We kindly request you to please pay it at your earliest convenience. "
-            ."If you have already made the payment, please ignore this message.\n\n"
-            ."Thank you for your continued support. 🏏\n\n"
-            ."Warm regards,\n{$academy}";
+        return "Dear {$guardian},\n\n"
+            ."Warm greetings from *{$academy}*. "
+            ."This is a gentle reminder that the fee of *{$amount}* for *{$child}* "
+            ."for the month of *{$this->period_label}* is still remaining. "
+            ."We kindly request you to please pay it at your earliest convenience.\n\n"
+            ."If you have already made the payment, please share the screenshot. "
+            ."Thank you for your continued support.\n\n"
+            ."*Warm regards,*\n"
+            ."*{$academy}*";
     }
 
     public static function nextInvoiceNo(): string

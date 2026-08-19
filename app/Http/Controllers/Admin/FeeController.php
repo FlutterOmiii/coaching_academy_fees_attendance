@@ -11,6 +11,7 @@ use App\Models\FeeStructure;
 use App\Models\Setting;
 use App\Models\Student;
 use App\Services\FeeBook;
+use App\Support\WhatsApp;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -64,6 +65,62 @@ class FeeController extends Controller
             'summary' => $book->summary($month),
             'batches' => Batch::active()->orderBy('name')->get(['id', 'name']),
         ]);
+    }
+
+    /**
+     * Start-of-month reminder blast: every active student with a one-tap
+     * WhatsApp message saying the fee is due on the configured due day and
+     * humbly asking to pay before then. wa.me cannot auto-send in bulk (that
+     * needs the paid Business API), so the page offers a rapid one-tap-per-
+     * parent "Send All" flow instead.
+     */
+    public function reminders(Request $request, FeeBook $book)
+    {
+        $month = $this->month($request);
+
+        $rows = $book->students($month)->get()->map(function (Student $student) use ($book, $month) {
+            $row = $book->row($student, $month);
+
+            return [
+                'student' => $student,
+                'batch' => $row['batch'],
+                'fee' => $row['fee'],
+                'status' => $row['status'],
+                'due_date' => $row['due_date'],
+                'wa_link' => WhatsApp::link(
+                    $student->guardian_phone,
+                    $this->monthlyReminderText($student, $row['fee'], $month, $row['due_date'])
+                ),
+            ];
+        });
+
+        return view('admin.fees.reminders', [
+            'month' => $month,
+            'rows' => $rows,
+            'dueDate' => FeeInvoice::dueDateFor($month),
+            'currency' => Setting::get('currency_symbol', '₹'),
+        ]);
+    }
+
+    /** The humble start-of-month message: fee due on day X, please pay before it. */
+    private function monthlyReminderText(Student $student, float $fee, Carbon $month, Carbon $due): string
+    {
+        $academy = Setting::get('academy_name', 'our academy');
+        $currency = Setting::get('currency_symbol', '₹');
+        $guardian = $student->guardian_name ?: 'Parent';
+        $amount = $fee > 0 ? ' of *'.$currency.number_format($fee).'*' : '';
+
+        return "Dear {$guardian},\n\n"
+            ."Warm greetings from *{$academy}*. "
+            ."This is a gentle reminder that the monthly fee{$amount} for "
+            ."*{$student->full_name}* for the month of *{$month->format('F Y')}* "
+            ."is due on *{$due->format('d M Y')}*. "
+            ."We kindly request you to please pay before *{$due->format('d M')}* "
+            ."at your earliest convenience.\n\n"
+            ."If you have already made the payment, please share the screenshot. "
+            ."Thank you for your continued support.\n\n"
+            ."*Warm regards,*\n"
+            ."*{$academy}*";
     }
 
     /** A student's full payment history, for the History popup. */
