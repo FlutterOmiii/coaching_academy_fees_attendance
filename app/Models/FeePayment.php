@@ -75,6 +75,49 @@ class FeePayment extends Model
         return self::MODES[$this->mode] ?? ucfirst((string) $this->mode);
     }
 
+    /**
+     * The WhatsApp payment confirmation — the receipt as a message, in the
+     * house format. Says "fully paid" once the invoice balance reaches zero.
+     */
+    public function receiptMessage(): string
+    {
+        $academy = Setting::get('academy_name', 'our academy');
+        $currency = Setting::get('currency_symbol', '₹');
+        $guardian = $this->student?->guardian_name ?: 'Parent';
+        $child = $this->student?->full_name ?: 'your child';
+        $month = $this->invoice?->period_label ?? '';
+        $balance = (float) ($this->invoice?->balance_amount ?? 0);
+
+        $lines = [
+            "Dear {$guardian},",
+            '',
+            "Warm greetings from *{$academy}*. We have received the payment of "
+                ."*{$currency}".number_format((float) $this->amount).'* for '
+                ."*{$child}*".($month ? " for the month of *{$month}*" : '').'. ✅',
+            '',
+            '🧾 *Payment Receipt*',
+            "Receipt No: {$this->receipt_no}",
+            'Date: '.$this->payment_date?->format('d M Y'),
+            'Mode: '.($this->mode_label ?? ucfirst((string) $this->mode)),
+        ];
+
+        if ($this->reference_no) {
+            $lines[] = "Ref: {$this->reference_no}";
+        }
+
+        $lines[] = '';
+        $lines[] = $balance <= 0
+            ? "The fee".($month ? " for *{$month}*" : '')." is now *fully paid*. 🙏"
+            : "Remaining balance: *{$currency}".number_format($balance).'*.';
+        $lines[] = '';
+        $lines[] = 'Thank you for your continued support.';
+        $lines[] = '';
+        $lines[] = '*Warm regards,*';
+        $lines[] = "*{$academy}*";
+
+        return implode("\n", $lines);
+    }
+
     public static function nextReceiptNo(): string
     {
         $last = static::max('id') ?? 0;

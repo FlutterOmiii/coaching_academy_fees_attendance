@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CoachSalaryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\FeeController;
+use App\Http\Controllers\Admin\MatchFeeController;
 use App\Http\Controllers\Admin\PersonalExpenseController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\SettingController;
@@ -156,6 +157,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('fees/pending', [FeeController::class, 'pending'])->name('fees.pending');
             Route::get('fees/reminders', [FeeController::class, 'reminders'])
                 ->middleware('ability:fees.manage')->name('fees.reminders');
+
+            // Match Fees: one-off matches with per-student fee collection.
+            // Literal segments (create/records) sit above the {match} binding.
+            Route::get('fees/matches', [MatchFeeController::class, 'index'])->name('fees.matches.index');
+            Route::get('fees/matches/records', [MatchFeeController::class, 'records'])->name('fees.matches.records');
+            Route::get('fees/match-receipts/{matchFee}', [MatchFeeController::class, 'receipt'])->name('fees.matches.receipt');
+            // whereNumber keeps literal paths (create) out of the binding.
+            Route::get('fees/matches/{match}', [MatchFeeController::class, 'show'])
+                ->whereNumber('match')->name('fees.matches.show');
             Route::get('fees/structures', [FeeController::class, 'structures'])->name('fees.structures');
             Route::get('fees/history/{student}', [FeeController::class, 'history'])->name('fees.history');
             Route::get('fees/invoices', [FeeController::class, 'invoices'])->name('fees.invoices');
@@ -175,6 +185,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('fees/invoices/{invoice}/pay', [FeeController::class, 'collect'])->name('fees.collect');
             Route::post('fees/invoices/{invoice}/remind', [FeeController::class, 'remind'])->name('fees.remind');
 
+            // Match Fees management.
+            Route::get('fees/matches/create', [MatchFeeController::class, 'create'])->name('fees.matches.create');
+            Route::post('fees/matches', [MatchFeeController::class, 'store'])->name('fees.matches.store');
+            Route::get('fees/matches/{match}/edit', [MatchFeeController::class, 'edit'])
+                ->whereNumber('match')->name('fees.matches.edit');
+            Route::put('fees/matches/{match}', [MatchFeeController::class, 'update'])
+                ->whereNumber('match')->name('fees.matches.update');
+            Route::post('fees/matches/{match}/students', [MatchFeeController::class, 'addStudents'])
+                ->whereNumber('match')->name('fees.matches.students');
+            Route::put('fees/match-records/{matchFee}/pay', [MatchFeeController::class, 'pay'])
+                ->name('fees.matches.pay');
+            Route::put('fees/match-records/{matchFee}/pending', [MatchFeeController::class, 'markPending'])
+                ->name('fees.matches.pending');
+
             // One-click collection straight from the student row.
             Route::post('fees/collect/{student}', [FeeController::class, 'collectForStudent'])
                 ->name('fees.collect-student');
@@ -188,6 +212,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 ->name('fees.structures.destroy');
             Route::delete('fees/invoices/{invoice}', [FeeController::class, 'destroyInvoice'])
                 ->name('fees.invoices.destroy');
+            Route::delete('fees/matches/{match}', [MatchFeeController::class, 'destroy'])
+                ->whereNumber('match')->name('fees.matches.destroy');
+            Route::delete('fees/match-records/{matchFee}', [MatchFeeController::class, 'destroyRecord'])
+                ->name('fees.matches.records.destroy');
         });
 
         // ---------------------------------------------------------- Expenses

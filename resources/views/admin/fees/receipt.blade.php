@@ -11,6 +11,11 @@
         $payment->receipt_no => null,
     ]">
         <x-slot:actions>
+            @if ($waLink ?? null)
+                <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-success btn-sm">
+                    📲 Send Receipt on WhatsApp
+                </a>
+            @endif
             <button onclick="window.print()" class="btn btn-outline-primary btn-sm">Print</button>
             <a href="{{ route('admin.fees.invoices.show', $payment->fee_invoice_id) }}"
                 class="btn btn-outline-info btn-sm">View Invoice</a>

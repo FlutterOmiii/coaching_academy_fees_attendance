@@ -68,6 +68,12 @@ class Student extends Model
         return $this->hasMany(BatchTransfer::class);
     }
 
+    /** One-off match fees, separate from monthly invoices. */
+    public function matchFees(): HasMany
+    {
+        return $this->hasMany(MatchFee::class);
+    }
+
     public function feeInvoices(): HasMany
     {
         return $this->hasMany(FeeInvoice::class);

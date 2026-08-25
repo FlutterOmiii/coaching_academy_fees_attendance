@@ -257,6 +257,58 @@
                     </table>
                 </div>
             </div>
+
+            {{-- Match fees: one-off matches, separate from the monthly invoices. --}}
+            @if ($matchFees->isNotEmpty())
+                <div class="panel">
+                    <div class="flex items-center justify-between mb-4">
+                        <h5 class="font-semibold dark:text-white-light">🏏 Match Fees</h5>
+                        <span class="text-xs text-white-dark">
+                            Paid {{ $currency }}{{ number_format($matchFees->where('status', 'paid')->sum('amount')) }}
+                            across {{ $matchFees->count() }} match(es)
+                        </span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Match</th>
+                                    <th>Date</th>
+                                    <th>Fee</th>
+                                    <th>Status</th>
+                                    <th>Payment</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($matchFees as $mf)
+                                    <tr>
+                                        <td><a href="{{ route('admin.fees.matches.show', $mf->fee_match_id) }}"
+                                                class="font-semibold hover:text-primary">{{ $mf->match?->title }}</a></td>
+                                        <td>{{ $mf->match?->match_date?->format('d M Y') }}</td>
+                                        <td class="font-semibold">{{ $currency }}{{ number_format($mf->amount) }}</td>
+                                        <td>
+                                            @if ($mf->status === 'paid')
+                                                <span class="badge bg-success/15 text-success font-bold">Paid</span>
+                                            @else
+                                                <span class="badge bg-warning/15 text-warning font-bold">Pending</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-sm">
+                                            @if ($mf->status === 'paid')
+                                                {{ $mf->payment_date?->format('d M Y') }} · {{ $mf->mode_label }}
+                                                · <a href="{{ route('admin.fees.matches.receipt', $mf) }}"
+                                                    class="text-primary hover:underline">{{ $mf->receipt_no }}</a>
+                                            @else
+                                                —
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
             @endability
 
             {{-- Documents --}}

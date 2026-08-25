@@ -228,6 +228,10 @@ class StudentController extends Controller
         return view('admin.students.show', [
             'student' => $student,
             'invoices' => $invoices,
+            // One-off match fees, shown beside the monthly fee history.
+            'matchFees' => auth('admin')->user()?->hasAbility('finance.view')
+                ? $student->matchFees()->with('match:id,title,match_date')->latest('id')->get()
+                : collect(),
             'attendanceStats' => $attendanceStats,
             'career' => $career,
             'batches' => Batch::active()->orderBy('name')->get(['id', 'name']),

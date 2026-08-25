@@ -472,7 +472,11 @@ class FeeController extends Controller
     {
         $payment->load(['student', 'invoice.batch', 'receivedBy']);
 
-        return view('admin.fees.receipt', compact('payment'));
+        return view('admin.fees.receipt', [
+            'payment' => $payment,
+            // One tap sends the receipt to the guardian on WhatsApp.
+            'waLink' => WhatsApp::link($payment->student?->guardian_phone, $payment->receiptMessage()),
+        ]);
     }
 
     /** Log a reminder for every student who still owes for the month. */

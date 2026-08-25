@@ -22,6 +22,7 @@
             ['Invoices', 'invoice', 'admin.fees.invoices', 'fees.view'],
             ['Pending Fees', 'pending', 'admin.fees.pending', 'fees.view'],
             ['Fee Reminders', 'bell', 'admin.fees.reminders', 'fees.manage'],
+            ['Match Fees', 'match', 'admin.fees.matches.index', 'fees.view'],
             ['Expenses', 'expense', 'admin.expenses.index', 'expenses.view'],
             ['Coach Salaries', 'salary', 'admin.expenses.salaries', 'expenses.view'],
         ],
