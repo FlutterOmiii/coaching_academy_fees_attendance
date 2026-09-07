@@ -11,7 +11,7 @@
 
     <x-admin.page-header :title="$student->full_name" :subtitle="$student->student_code . ' · ' . $student->age . ' yrs · ' . $student->playing_role_label" :breadcrumbs="$crumbs">
         <x-slot:actions>
-            <a href="{{ route('admin.students.admission', $student) }}" class="btn btn-outline-info btn-sm">📄 Admission Form</a>
+            <a href="{{ route('admin.students.admission-form', $student) }}" class="btn btn-outline-info btn-sm">📄 Admission Form</a>
             <form method="POST" action="{{ route('admin.students.toggle-status', $student) }}">
                 @csrf @method('PATCH')
                 <button class="btn btn-sm {{ $student->status === 'active' ? 'btn-outline-warning' : 'btn-outline-success' }}">
@@ -46,7 +46,7 @@
                 @else
                     <span class="text-xs text-white-dark">No valid guardian mobile number on file.</span>
                 @endif
-                <a href="{{ route('admin.students.admission', $student) }}" class="btn btn-outline-info">View Form</a>
+                <a href="{{ route('admin.students.admission-form', $student) }}" class="btn btn-outline-info">View Form</a>
                 <button type="button" @click="shown = false" class="text-xl leading-none text-white-dark hover:text-danger">&times;</button>
             </div>
         </div>

@@ -69,7 +69,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('students/{student}', [StudentController::class, 'show'])
             ->middleware('ability:students.view')->name('students.show');
         Route::get('students/{student}/admission-form', [StudentController::class, 'admissionForm'])
-            ->middleware('ability:students.view')->name('students.admission');
+            ->middleware('ability:students.view')->name('students.admission-form');
         Route::get('students/{student}/edit', [StudentController::class, 'edit'])
             ->middleware('ability:students.edit')->name('students.edit');
         Route::put('students/{student}', [StudentController::class, 'update'])
