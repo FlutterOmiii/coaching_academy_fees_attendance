@@ -89,7 +89,7 @@ class FeeController extends Controller
                 'due_date' => $row['due_date'],
                 'wa_link' => WhatsApp::link(
                     $student->guardian_phone,
-                    $this->monthlyReminderText($student, $row['fee'], $month, $row['due_date'])
+                    $this->monthlyReminderText($student, $row['fee'], $month, $row['due_date'], $row['invoice'])
                 ),
             ];
         });
@@ -103,12 +103,18 @@ class FeeController extends Controller
     }
 
     /** The humble start-of-month message: fee due on day X, please pay before it. */
-    private function monthlyReminderText(Student $student, float $fee, Carbon $month, Carbon $due): string
+    private function monthlyReminderText(Student $student, float $fee, Carbon $month, Carbon $due, ?FeeInvoice $invoice = null): string
     {
         $academy = Setting::get('academy_name', 'our academy');
         $currency = Setting::get('currency_symbol', '₹');
         $guardian = $student->guardian_name ?: 'Parent';
         $amount = $fee > 0 ? ' of *'.$currency.number_format($fee).'*' : '';
+
+        // When the month is already billed, include the invoice itself.
+        $invoiceBlock = $invoice
+            ? "📄 View the invoice:\n"
+                .\Illuminate\Support\Facades\URL::signedRoute('public.invoice', ['invoice' => $invoice->id])."\n\n"
+            : '';
 
         return "Dear {$guardian},\n\n"
             ."Warm greetings from *{$academy}*. "
@@ -117,6 +123,7 @@ class FeeController extends Controller
             ."is due on *{$due->format('d M Y')}*. "
             ."We kindly request you to please pay before *{$due->format('d M')}* "
             ."at your earliest convenience.\n\n"
+            .$invoiceBlock
             ."If you have already made the payment, please share the screenshot. "
             ."Thank you for your continued support.\n\n"
             ."*Warm regards,*\n"
@@ -311,7 +318,11 @@ class FeeController extends Controller
     {
         $invoice->load(['student', 'batch', 'feeStructure', 'payments.receivedBy', 'reminders', 'createdBy']);
 
-        return view('admin.fees.invoice-show', compact('invoice'));
+        return view('admin.fees.invoice-show', [
+            'invoice' => $invoice,
+            // Sends the bill (with its public link) to the guardian on WhatsApp.
+            'waLink' => WhatsApp::link($invoice->student?->guardian_phone, $invoice->reminderMessage()),
+        ]);
     }
 
     public function destroyInvoice(FeeInvoice $invoice)

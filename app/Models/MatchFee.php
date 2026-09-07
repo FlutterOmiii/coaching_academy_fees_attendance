@@ -93,6 +93,9 @@ class MatchFee extends Model
         $lines[] = '';
         $lines[] = 'The match fee is now *fully paid*. 🙏';
         $lines[] = '';
+        $lines[] = '📄 View / download your receipt:';
+        $lines[] = \Illuminate\Support\Facades\URL::signedRoute('public.match-receipt', ['matchFee' => $this->id]);
+        $lines[] = '';
         $lines[] = 'Thank you for your continued support.';
         $lines[] = '';
         $lines[] = '*Warm regards,*';

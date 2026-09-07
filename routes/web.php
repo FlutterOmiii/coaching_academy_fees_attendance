@@ -25,6 +25,17 @@ Route::get('/', fn () => redirect()->route('admin.login'));
 Route::get('admission/{student}', [StudentController::class, 'admissionFormPublic'])
     ->middleware('signed')->name('admission.view');
 
+// Guardian-facing fee documents, opened from WhatsApp messages. Signed URLs
+// are unguessable and need no login; each shows exactly one document.
+Route::middleware('signed')->group(function () {
+    Route::get('receipt/{payment}', [\App\Http\Controllers\PublicDocumentController::class, 'receipt'])
+        ->name('public.receipt');
+    Route::get('match-receipt/{matchFee}', [\App\Http\Controllers\PublicDocumentController::class, 'matchReceipt'])
+        ->name('public.match-receipt');
+    Route::get('invoice/{invoice}', [\App\Http\Controllers\PublicDocumentController::class, 'invoice'])
+        ->name('public.invoice');
+});
+
 /*
 |--------------------------------------------------------------------------
 | Admin

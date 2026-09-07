@@ -134,12 +134,14 @@
                         ]" />
                 </x-admin.field>
 
-                @unless ($editing)
-                    <x-admin.field label="Assign to Batch" name="batch_id" hint="Optional — can be set later">
-                        <x-admin.searchable-select name="batch_id" placeholder="-- No batch --"
-                            :options="$batches->map(fn($b) => ['id' => $b->id, 'name' => $b->name])" />
-                    </x-admin.field>
-                @endunless
+                <x-admin.field label="{{ $editing ? 'Batch' : 'Assign to Batch' }}" name="batch_id"
+                    :hint="$editing
+                        ? 'Changing it moves the student — recorded in batch history'
+                        : 'Optional — can be set later'">
+                    <x-admin.searchable-select name="batch_id" placeholder="-- No batch --"
+                        :selected="old('batch_id', $student->activeBatches->first()?->id)"
+                        :options="$batches->map(fn($b) => ['id' => $b->id, 'name' => $b->name])" />
+                </x-admin.field>
             </div>
         </div>
 

@@ -11,6 +11,11 @@
 
     <x-admin.page-header :title="$invoice->invoice_no" :subtitle="$invoice->student?->full_name . ' · ' . $invoice->period_label" :breadcrumbs="$crumbs">
         <x-slot:actions>
+            @if (($waLink ?? null) && $invoice->balance_amount > 0)
+                <a href="{{ $waLink }}" target="_blank" rel="noopener" class="btn btn-success btn-sm">
+                    📲 Send Invoice on WhatsApp
+                </a>
+            @endif
             @if (!$invoice->payments->count())
                 <form method="POST" action="{{ route('admin.fees.invoices.destroy', $invoice) }}"
                     onsubmit="return confirm('Delete this invoice?')">

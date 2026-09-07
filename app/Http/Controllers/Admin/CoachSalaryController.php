@@ -168,7 +168,8 @@ class CoachSalaryController extends Controller
         $academy = Setting::get('academy_name', 'Cricket Academy');
 
         $lines = [
-            'Hi '.$coach->first_name.',',
+            // Respectful address: Sir/Madam by the coach's gender.
+            'Hi '.$coach->first_name.' '.($coach->gender === 'female' ? 'Madam' : 'Sir').',',
             '',
             'Your salary for *'.$payment->salary_month?->format('F Y').'* has been paid. ✅',
             '',

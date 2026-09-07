@@ -110,6 +110,9 @@ class FeePayment extends Model
             ? "The fee".($month ? " for *{$month}*" : '')." is now *fully paid*. 🙏"
             : "Remaining balance: *{$currency}".number_format($balance).'*.';
         $lines[] = '';
+        $lines[] = '📄 View / download your receipt:';
+        $lines[] = \Illuminate\Support\Facades\URL::signedRoute('public.receipt', ['payment' => $this->id]);
+        $lines[] = '';
         $lines[] = 'Thank you for your continued support.';
         $lines[] = '';
         $lines[] = '*Warm regards,*';

@@ -51,6 +51,7 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $data = $this->validated($request);
+        $request->validate(['batch_id' => 'nullable|exists:batches,id']);
         $batchId = $request->input('batch_id');
 
         $student = DB::transaction(function () use ($request, $data, $batchId) {
@@ -258,9 +259,54 @@ class StudentController extends Controller
 
         $student->update($data);
 
+        // A changed batch on the edit form moves the student, with the same
+        // pivot bookkeeping and history record as the transfer flow.
+        $this->syncBatch($student, $request);
+
         return redirect()
             ->route('admin.students.show', $student)
             ->with('success', 'Student details updated.');
+    }
+
+    /** Move the student when the edit form picks a different batch. */
+    private function syncBatch(Student $student, Request $request): void
+    {
+        $request->validate(['batch_id' => 'nullable|exists:batches,id']);
+        $batchId = (int) $request->input('batch_id');
+
+        // Empty selection leaves the current membership untouched.
+        if (! $batchId) {
+            return;
+        }
+
+        $current = $student->activeBatches()->first();
+
+        if ($current && (int) $current->id === $batchId) {
+            return;
+        }
+
+        DB::transaction(function () use ($student, $current, $batchId) {
+            if ($current) {
+                $student->batches()->updateExistingPivot($current->id, [
+                    'status' => 'transferred',
+                    'left_on' => now()->toDateString(),
+                ]);
+            }
+
+            $student->batches()->attach($batchId, [
+                'joined_on' => now()->toDateString(),
+                'status' => 'active',
+            ]);
+
+            BatchTransfer::create([
+                'student_id' => $student->id,
+                'from_batch_id' => $current?->id,
+                'to_batch_id' => $batchId,
+                'transferred_on' => now()->toDateString(),
+                'reason' => 'Changed on the edit form',
+                'transferred_by' => auth('admin')->id(),
+            ]);
+        });
     }
 
     public function destroy(Student $student)

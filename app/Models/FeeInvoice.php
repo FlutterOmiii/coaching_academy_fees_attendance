@@ -214,11 +214,14 @@ class FeeInvoice extends Model
         $child = $this->student?->full_name ?: 'your child';
         $amount = $currency.number_format((float) $this->balance_amount);
 
+        $invoiceLink = \Illuminate\Support\Facades\URL::signedRoute('public.invoice', ['invoice' => $this->id]);
+
         return "Dear {$guardian},\n\n"
             ."Warm greetings from *{$academy}*. "
             ."This is a gentle reminder that the fee of *{$amount}* for *{$child}* "
             ."for the month of *{$this->period_label}* is still remaining. "
             ."We kindly request you to please pay it at your earliest convenience.\n\n"
+            ."📄 View the invoice:\n{$invoiceLink}\n\n"
             ."If you have already made the payment, please share the screenshot. "
             ."Thank you for your continued support.\n\n"
             ."*Warm regards,*\n"
