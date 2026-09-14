@@ -9,6 +9,7 @@ use App\Models\BatchTransfer;
 use App\Models\Setting;
 use App\Models\Student;
 use App\Models\StudentDocument;
+use App\Services\StudentRegistrar;
 use App\Support\WhatsApp;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -48,30 +49,15 @@ class StudentController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, StudentRegistrar $registrar)
     {
         $data = $this->validated($request);
         $request->validate(['batch_id' => 'nullable|exists:batches,id']);
         $batchId = $request->input('batch_id');
 
-        $student = DB::transaction(function () use ($request, $data, $batchId) {
-            $data['student_code'] = Student::nextCode();
-
-            if ($request->hasFile('photo')) {
-                $data['photo'] = StorageHelper::upload($request->file('photo'), 'students');
-            }
-
-            $student = Student::create($data);
-
-            if ($batchId) {
-                $student->batches()->attach($batchId, [
-                    'joined_on' => $data['admission_date'],
-                    'status' => 'active',
-                ]);
-            }
-
-            return $student;
-        });
+        // Shared with the website admission API so both entry points allocate
+        // the code, store the photo and enrol the batch under the same rules.
+        $student = $registrar->register($data, $request->file('photo'), $batchId ? (int) $batchId : null);
 
         return redirect()
             ->route('admin.students.show', $student)

@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\DB;
  *
  * Existing all-rounders are mapped to batting_allrounder as the starting
  * point; individual students can be switched to bowling_allrounder on edit.
+ *
+ * ENUM widening is MySQL syntax. On any other driver — SQLite, used by the
+ * test suite — enum columns are plain strings that already accept the new
+ * vocabulary, so there is nothing to alter and nothing to back-fill on a
+ * freshly migrated database. Production runs on MySQL and is unaffected.
  */
 return new class extends Migration
 {
@@ -19,6 +24,10 @@ return new class extends Migration
 
     public function up(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         // Widen each enum to accept both vocabularies, move the data, then
         // narrow to the new vocabulary only.
         $all = "'".implode("','", array_unique([...self::OLD, ...self::NEW]))."'";
@@ -37,6 +46,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         $all = "'".implode("','", array_unique([...self::OLD, ...self::NEW]))."'";
         $old = "'".implode("','", self::OLD)."'";
 

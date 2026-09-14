@@ -14,6 +14,9 @@ class Student extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /** admission_source value for a student imported from the public website. */
+    public const SOURCE_WEBSITE = 'website';
+
     public const PLAYING_ROLES = [
         'batter' => 'Batter',
         'bowler' => 'Bowler',
@@ -28,6 +31,8 @@ class Student extends Model
         'guardian_name', 'guardian_phone', 'guardian_email', 'guardian_relation',
         'playing_role', 'batting_style', 'bowling_style',
         'admission_date', 'admission_status', 'status', 'medical_notes', 'notes',
+        // Website integration bookkeeping; null for students added in the panel.
+        'website_admission_uuid', 'admission_source', 'source_reference', 'synced_at',
     ];
 
     protected function casts(): array
@@ -35,6 +40,7 @@ class Student extends Model
         return [
             'date_of_birth' => 'date',
             'admission_date' => 'date',
+            'synced_at' => 'datetime',
         ];
     }
 
@@ -116,6 +122,12 @@ class Student extends Model
     public function scopeApproved(Builder $query): Builder
     {
         return $query->where('admission_status', 'approved');
+    }
+
+    /** Students that arrived through the public website admission form. */
+    public function scopeFromWebsite(Builder $query): Builder
+    {
+        return $query->where('admission_source', self::SOURCE_WEBSITE);
     }
 
     public function scopeSearch(Builder $query, ?string $term): Builder

@@ -83,7 +83,13 @@
                                     <div class="min-w-0">
                                         <a href="{{ route('admin.students.show', $student) }}"
                                             class="font-semibold hover:text-primary">{{ $student->full_name }}</a>
-                                        <div class="text-xs text-white-dark">{{ $student->student_code }}</div>
+                                        <div class="flex items-center gap-1.5 text-xs text-white-dark">
+                                            <span>{{ $student->student_code }}</span>
+                                            @if ($student->admission_source === \App\Models\Student::SOURCE_WEBSITE)
+                                                <span class="badge bg-success/15 text-success text-[10px]"
+                                                    title="Admission received through the website form">Website</span>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </td>

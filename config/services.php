@@ -28,6 +28,14 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    /*
+    | Shared secret the public website presents when pushing an admission into
+    | the CRM. Set the same value in the website's CRM_ADMISSION_API_TOKEN.
+    */
+    'website_admission' => [
+        'token' => env('WEBSITE_ADMISSION_API_TOKEN'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
